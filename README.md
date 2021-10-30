@@ -1,6 +1,4 @@
-# npo-backend-template
-This template will be used to create all NPO backend repos
-
+# Find Your Anchor Backend
 ## Available Scripts
 
 In the project directory, you can run:
