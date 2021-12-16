@@ -1,8 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-
 require('dotenv').config();
 
+// Uncomment this when we start querying the database
+// const {db} = require('./config');
+
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const app = express();
 
 const PORT = process.env.PORT || 3001;
