@@ -1,9 +1,9 @@
 // eslint-disable no-console
 const router = require('express-promise-router')();
-const multer = require('multer');
+// const multer = require('multer');
 const { db } = require('../config');
 
-const upload = multer({ dest: 'uploads/' });
+// const upload = multer({ dest: 'uploads/' });
 
 const SQLQueries = {
   CreateAnchorBox:
@@ -11,7 +11,7 @@ const SQLQueries = {
   Return: 'RETURNING *',
 };
 
-router.post('/', upload.single('box_photo'), async (req, res) => {
+router.post('/', async (req, res) => {
   try {
     console.log(req.file);
 

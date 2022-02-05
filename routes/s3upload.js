@@ -1,4 +1,4 @@
-const s3router = require('express-promise-router')();
+const s3UploadRouter = require('express-promise-router')();
 const aws = require('aws-sdk');
 const crypto = require('crypto');
 
@@ -16,20 +16,21 @@ const s3 = new aws.S3({
 });
 
 // get a S3 URL
-s3router.get('/', async (req, res) => {
+s3UploadRouter.get('/', async (req, res) => {
   try {
     // generate a unique name for image
     const rawBytes = await crypto.randomBytes(16);
     const imageName = rawBytes.toString('hex');
 
+    // set up s3 params
     const params = {
       Bucket: bucketName,
       Key: imageName,
       Expires: 60,
     };
 
+    // get a s3 upload url
     const uploadURL = await s3.getSignedUrl('putObject', params);
-    console.log('UPLOAD URL: ', uploadURL);
     res.status(200).send(uploadURL);
   } catch (error) {
     console.error(error);
@@ -37,4 +38,4 @@ s3router.get('/', async (req, res) => {
   }
 });
 
-module.exports = s3router;
+module.exports = s3UploadRouter;
