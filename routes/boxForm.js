@@ -1,36 +1,30 @@
 // eslint-disable no-console
-const router = require('express-promise-router')();
-// const multer = require('multer');
-const { db } = require('../config');
 
-// const upload = multer({ dest: 'uploads/' });
+const router = require('express-promise-router')();
+const { db } = require('../config');
 
 const SQLQueries = {
   CreateAnchorBox:
-    'INSERT INTO public."Anchor_Box"(box_id, picture, approved, message, current_location) VALUES ($1, $2, $3, $4, $5)',
+    'INSERT INTO public."Anchor_Box"(box_id, approved, message, current_location, pickup, picture) VALUES ($1, $2, $3, $4, $5, $6)',
   Return: 'RETURNING *',
 };
 
 router.post('/', async (req, res) => {
   try {
-    console.log(req.file);
+    const { boxNumber, date, zipCode, boxLocation, message, boxPhotoUrl, comments } = req.body;
 
-    const { date, boxId, boxLocation, message } = req.body;
-
-    console.log(date);
+    console.log(date, boxLocation, comments);
 
     // insert into Anchor_Box
-    const array = [1, 2];
-    await db.query(
-      SQLQueries.CreateAnchorBox + SQLQueries.Return,
-      [boxId, array, false, message, boxLocation],
-      (error, results) => {
-        if (error) {
-          throw error;
-        }
-        res.send(results.rows);
-      },
-    );
+    const allBoxes = await db.query(SQLQueries.CreateAnchorBox + SQLQueries.Return, [
+      boxNumber,
+      false,
+      message,
+      zipCode,
+      false,
+      boxPhotoUrl,
+    ]);
+    res.status(200).send(allBoxes.rows);
   } catch (error) {
     console.error(`Error: ${error}`);
   }
@@ -47,10 +41,3 @@ module.exports = router;
 // box photo
 // comments
 // launched organically?
-
-// await db.query('SELECT * FROM "Admin"', (error, results) => {
-//   if (error) {
-//     throw error;
-//   }
-//   res.send(results.rows)
-// });

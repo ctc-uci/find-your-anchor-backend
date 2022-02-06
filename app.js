@@ -5,14 +5,13 @@ require('dotenv').config();
 
 // Uncomment this when we start querying the database
 // const {db} = require('./config');
-// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const boxFormRouter = require('./routes/boxForm');
 const s3UploadRouter = require('./routes/s3upload');
 
 const app = express();
 // body parser middleware
-// app.use(express.json({ extended: false }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(bodyParser.raw());
@@ -25,11 +24,6 @@ app.use(
     credentials: true,
   }),
 );
-
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-  next();
-});
 
 app.use('/boxForm', boxFormRouter);
 app.use('/s3Upload', s3UploadRouter);
