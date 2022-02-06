@@ -11,9 +11,10 @@ const SQLQueries = {
 
 router.post('/', async (req, res) => {
   try {
-    const { boxNumber, date, zipCode, boxLocation, message, boxPhotoUrl, comments } = req.body;
+    const { boxNumber, date, zipCode, boxLocation, message, picture, comments } = req.body;
 
     console.log(date, boxLocation, comments);
+    console.log(req.body);
 
     // insert into Anchor_Box
     const allBoxes = await db.query(SQLQueries.CreateAnchorBox + SQLQueries.Return, [
@@ -22,7 +23,7 @@ router.post('/', async (req, res) => {
       message,
       zipCode,
       false,
-      boxPhotoUrl,
+      picture,
     ]);
     res.status(200).send(allBoxes.rows);
   } catch (error) {
