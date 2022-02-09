@@ -40,13 +40,15 @@ pickupBoxRouter.put('/rejected', async (req, res) => {
   }
 });
 
-// get all pickupboxes evaluated
-pickupBoxRouter.get('/evaluated', async (req, res) => {
+// move box from under review to pending
+pickupBoxRouter.put('/updatePending', async (req, res) => {
   try {
-    const allBoxes = await db.query(
-      'SELECT * FROM "Anchor_Box" WHERE pickup = true AND evaluated = TRUE',
+    const boxID = req.body.box_id;
+    const rejectedBoxes = await db.query(
+      'UPDATE "Anchor_Box" SET under_review = false AND pending_changes = true WHERE box_id = $1',
+      [boxID],
     );
-    res.status(200).send(allBoxes);
+    res.status(200).send(rejectedBoxes);
   } catch (err) {
     console.error(err.message);
     res.status(500).send(err.message);

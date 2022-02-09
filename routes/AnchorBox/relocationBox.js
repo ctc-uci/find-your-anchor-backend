@@ -5,6 +5,51 @@ const { db } = require('../../config');
 
 relocationBoxRouter.use(express.json());
 
+// move box from under review to evaluated (approved box)
+relocationBoxRouter.put('/approved', async (req, res) => {
+  try {
+    const boxID = req.body.box_id;
+    const approvedBoxes = await db.query(
+      'UPDATE "Anchor_Box" SET under_review = false AND evaluated = true WHERE box_id = $1',
+      [boxID],
+    );
+    res.status(200).send(approvedBoxes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
+});
+
+// move box from under review to evaluated (rejected box)
+relocationBoxRouter.put('/rejected', async (req, res) => {
+  try {
+    const boxID = req.body.box_id;
+    const rejectedBoxes = await db.query(
+      'UPDATE "Anchor_Box" SET under_review = false AND evaluated = true WHERE box_id = $1',
+      [boxID],
+    );
+    res.status(200).send(rejectedBoxes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
+});
+
+// move box from under review to pending
+relocationBoxRouter.put('/updatePending', async (req, res) => {
+  try {
+    const boxID = req.body.box_id;
+    const rejectedBoxes = await db.query(
+      'UPDATE "Anchor_Box" SET under_review = false AND pending_changes = true WHERE box_id = $1',
+      [boxID],
+    );
+    res.status(200).send(rejectedBoxes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
+});
+
 // get all relocation boxes under review
 relocationBoxRouter.get('/underReview', async (req, res) => {
   try {
