@@ -40,6 +40,19 @@ pickupBoxRouter.put('/rejected', async (req, res) => {
   }
 });
 
+// get all pickupboxes evaluated
+pickupBoxRouter.get('/evaluated', async (req, res) => {
+  try {
+    const allBoxes = await db.query(
+      'SELECT * FROM "Anchor_Box" WHERE pickup = true AND evaluated = TRUE',
+    );
+    res.status(200).send(allBoxes);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.message);
+  }
+});
+
 // get all pickupboxes under review
 pickupBoxRouter.get('/underReview', async (req, res) => {
   try {
