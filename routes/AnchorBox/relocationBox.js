@@ -48,7 +48,7 @@ relocationBoxRouter.get('/', async (req, res) => {
   try {
     console.log('hello world');
     console.log(db);
-    const allBoxes = await db.query('SELECT * FROM "Anchor_Box";');
+    const allBoxes = await db.query('SELECT * FROM "Anchor_Box" WHERE pickup = false');
     res.status(200).send(allBoxes);
   } catch (err) {
     console.error(err.message);
