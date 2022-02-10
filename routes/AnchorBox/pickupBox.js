@@ -5,17 +5,12 @@ const { db } = require('../../config');
 
 pickupBoxRouter.use(express.json());
 
-// when user pushes arrow button, under_review = false and pending changes = true (put request)
-// when user pushes approve or reject, underreview = false exaluated = true
-// get all pickup boxes under review, evaluated, pending_changes
-// get all relocation boxes under review, evaluated, pending_changes
-
 // move box from under review to evaluated (approved box)
 pickupBoxRouter.put('/approved', async (req, res) => {
   try {
     const boxID = req.body.box_id;
     const approvedBoxes = await db.query(
-      'UPDATE "Anchor_Box" SET under_review = false AND evaluated = true WHERE box_id = $1',
+      'UPDATE "Anchor_Box" SET under_review = false, evaluated = true WHERE box_id = $1',
       [boxID],
     );
     res.status(200).send(approvedBoxes);
@@ -30,7 +25,7 @@ pickupBoxRouter.put('/rejected', async (req, res) => {
   try {
     const boxID = req.body.box_id;
     const rejectedBoxes = await db.query(
-      'UPDATE "Anchor_Box" SET under_review = false AND evaluated = true WHERE box_id = $1',
+      'UPDATE "Anchor_Box" SET under_review = false, evaluated = true WHERE box_id = $1',
       [boxID],
     );
     res.status(200).send(rejectedBoxes);
@@ -40,20 +35,20 @@ pickupBoxRouter.put('/rejected', async (req, res) => {
   }
 });
 
-// move box from under review to pending
-pickupBoxRouter.put('/updatePending', async (req, res) => {
-  try {
-    const boxID = req.body.box_id;
-    const rejectedBoxes = await db.query(
-      'UPDATE "Anchor_Box" SET under_review = false AND pending_changes = true WHERE box_id = $1',
-      [boxID],
-    );
-    res.status(200).send(rejectedBoxes);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send(err.message);
-  }
-});
+// // move box from under review to pending
+// pickupBoxRouter.put('/updatePending', async (req, res) => {
+//   try {
+//     const boxID = req.body.box_id;
+//     const rejectedBoxes = await db.query(
+//       'UPDATE "Anchor_Box" SET under_review = false AND pending_changes = true WHERE box_id = $1',
+//       [boxID],
+//     );
+//     res.status(200).send(rejectedBoxes);
+//   } catch (err) {
+//     console.error(err.message);
+//     res.status(500).send(err.message);
+//   }
+// });
 
 // get all pickupboxes under review
 pickupBoxRouter.get('/underReview', async (req, res) => {

@@ -10,7 +10,7 @@ relocationBoxRouter.put('/approved', async (req, res) => {
   try {
     const boxID = req.body.box_id;
     const approvedBoxes = await db.query(
-      'UPDATE "Anchor_Box" SET under_review = false AND evaluated = true WHERE box_id = $1',
+      'UPDATE "Anchor_Box" SET under_review = false, evaluated = true WHERE box_id = $1',
       [boxID],
     );
     res.status(200).send(approvedBoxes);
@@ -25,7 +25,7 @@ relocationBoxRouter.put('/rejected', async (req, res) => {
   try {
     const boxID = req.body.box_id;
     const rejectedBoxes = await db.query(
-      'UPDATE "Anchor_Box" SET under_review = false AND evaluated = true WHERE box_id = $1',
+      'UPDATE "Anchor_Box" SET under_review = false, evaluated = true WHERE box_id = $1',
       [boxID],
     );
     res.status(200).send(rejectedBoxes);
