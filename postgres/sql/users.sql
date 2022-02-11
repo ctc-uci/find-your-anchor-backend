@@ -5,4 +5,4 @@ CREATE TABLE IF NOT EXISTS public."Users"
     role text COLLATE pg_catalog."default",
     email text COLLATE pg_catalog."default",
     user_id text COLLATE pg_catalog."default"
-)
+);
