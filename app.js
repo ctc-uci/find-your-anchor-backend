@@ -41,8 +41,7 @@ require('dotenv').config();
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const pickupBoxRouter = require('./routes/AnchorBox/pickupBox');
-const relocationBoxRouter = require('./routes/AnchorBox/relocationBox');
+const boxRouter = require('./routes/AnchorBox/box');
 
 const app = express();
 
@@ -60,8 +59,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/pickupBoxes', pickupBoxRouter);
-app.use('/relocationBoxes', relocationBoxRouter);
+app.use('/box', boxRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
