@@ -5,7 +5,7 @@ const { db } = require('../config');
 
 const SQLQueries = {
   CreateAnchorBox:
-    'INSERT INTO public."Anchor_Box"(box_id, approved, message, current_location, pickup, picture, evaluated, under_review, pending_changes, name, email, general_location, date, launched_organically) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)',
+    'INSERT INTO public."Anchor_Box"(box_id, approved, message, zip_code, picture, general_location, date, launched_organically, additional_comments) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
   Return: 'RETURNING *',
 };
 
@@ -18,12 +18,9 @@ router.post('/', async (req, res) => {
       boxLocation,
       message,
       picture,
-      comments,
+      additionalComments,
       launchedOrganically,
     } = req.body;
-
-    console.log(req.body);
-    console.log(comments);
 
     // insert into Anchor_Box
     const allBoxes = await db.query(SQLQueries.CreateAnchorBox + SQLQueries.Return, [
@@ -31,16 +28,11 @@ router.post('/', async (req, res) => {
       true,
       message,
       zipCode,
-      false,
       picture,
-      false,
-      false,
-      false,
-      'hello',
-      'hello@uci.edu',
       boxLocation,
       date,
       launchedOrganically,
+      additionalComments,
     ]);
     res.status(200).send(allBoxes.rows);
   } catch (error) {
