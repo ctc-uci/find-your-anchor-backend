@@ -3,8 +3,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
-// Uncomment this when we start querying the database
-// const {db} = require('./config');
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const boxFormRouter = require('./routes/boxForm');

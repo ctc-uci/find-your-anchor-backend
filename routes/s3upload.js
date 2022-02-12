@@ -3,15 +3,10 @@ const aws = require('aws-sdk');
 const crypto = require('crypto');
 
 // initialize a S3 instance
-const bucketName = process.env.S3_BUCKET_NAME;
-const accessKeyId = process.env.AWS_ACESS_KEY_ID;
-const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
-const region = process.env.AWS_REGION;
-
 const s3 = new aws.S3({
-  region,
-  accessKeyId,
-  secretAccessKey,
+  region: process.env.AWS_REGION,
+  accessKeyId: process.env.AWS_ACESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   signatureVersion: 'v4',
 });
 
@@ -24,7 +19,7 @@ s3UploadRouter.get('/', async (req, res) => {
 
     // set up s3 params
     const params = {
-      Bucket: bucketName,
+      Bucket: process.env.S3_BUCKET_NAME,
       Key: imageName,
       Expires: 60,
     };

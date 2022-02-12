@@ -41,13 +41,3 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
-
-// information obtained:
-// date
-// box number
-// zip code
-// box location
-// message
-// box photo
-// comments
-// launched organically?
