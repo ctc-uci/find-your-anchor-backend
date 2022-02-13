@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
     const anchorBox = await db.query(SQLQueries.FindBoxId, [boxNumber]);
 
     if (anchorBox.rows.length > 0) {
-      res.status(400).json({ error: `box number ${boxNumber} already exists` });
+      res.status(400).json({ message: `box number ${boxNumber} already exists` });
     }
 
     // 2. create new Anchor_Box if boxNumber does not exist
