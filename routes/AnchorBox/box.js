@@ -8,7 +8,7 @@ boxRouter.use(express.json());
 // update status of pick up box
 boxRouter.put('/updateStatus', async (req, res) => {
   try {
-    const { status, boxID } = req.params;
+    const { status, boxID } = req.body;
     const response = await db.query(
       'UPDATE "Box_History" SET status = $1 WHERE box_id = $2 RETURNING *',
       [status, boxID],
@@ -59,7 +59,7 @@ boxRouter.put('/approveBox', async (req, res) => {
       [boxID],
     );
     await db.query(
-      'UPDATE "Anchor_Box" SET message = $1, zip_code = $2, picture = $3, general_location = $4, date=$5, WHERE box_id = $6',
+      'UPDATE "Anchor_Box" SET message = $1, zip_code = $2, picture = $3, general_location = $4, date=$5 WHERE box_id = $6',
       [
         toCopy.rows[0].message,
         toCopy.rows[0].zip_code,
@@ -71,6 +71,7 @@ boxRouter.put('/approveBox', async (req, res) => {
     );
     res.status(200).send('Successfully approved box');
   } catch (err) {
+    console.error(err.message);
     res.status(500).send(err.message);
   }
 });
