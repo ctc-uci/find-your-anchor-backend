@@ -9,11 +9,11 @@ boxRouter.use(express.json());
 boxRouter.put('/updateStatus', async (req, res) => {
   try {
     const { status, boxID } = req.params;
-    const approvedBoxes = await db.query(
+    const response = await db.query(
       'UPDATE "Box_History" SET status = $1 WHERE box_id = $2 RETURNING *',
       [status, boxID],
     );
-    res.status(200).send(approvedBoxes);
+    res.status(200).send(response);
   } catch (err) {
     console.error(err.message);
     res.status(500).send(err.message);
@@ -35,13 +35,11 @@ boxRouter.get('/getBoxes', async (req, res) => {
   }
 });
 
-// get a pickup box
+// get a box
 boxRouter.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const box = await db.query('SELECT * FROM "Box_History" WHERE box_id = $1', [id]);
-    console.log(box.rows);
-    console.log(box);
     if (box.length === 0) {
       res.status(400).send(box);
     } else {
@@ -61,15 +59,17 @@ boxRouter.put('/approveBox', async (req, res) => {
       [boxID],
     );
     await db.query(
-      'UPDATE "Anchor_Box" SET message = $1, zip_code = $2, picture = $3, general_location = $4 WHERE box_id = $5',
+      'UPDATE "Anchor_Box" SET message = $1, zip_code = $2, picture = $3, general_location = $4, date=$5, WHERE box_id = $6',
       [
         toCopy.rows[0].message,
         toCopy.rows[0].zip_code,
         toCopy.rows[0].picture,
         toCopy.rows[0].general_location,
+        toCopy.rows[0].date,
         toCopy.rows[0].box_id,
       ],
     );
+    res.status(200).send('Successfully approved box');
   } catch (err) {
     res.status(500).send(err.message);
   }
