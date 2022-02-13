@@ -5,7 +5,8 @@ const { db } = require('../config');
 
 const SQLQueries = {
   CreateAnchorBox:
-    'INSERT INTO public."Anchor_Box"(box_id, approved, message, zip_code, picture, general_location, date, launched_organically, additional_comments) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+    'INSERT INTO "Anchor_Box"(box_id, approved, message, zip_code, picture, general_location, date, launched_organically, additional_comments) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+  FindBoxId: 'SELECT box_id FROM "Anchor_Box" WHERE box_id = $1',
   Return: 'RETURNING *',
 };
 
@@ -22,7 +23,14 @@ router.post('/', async (req, res) => {
       launchedOrganically,
     } = req.body;
 
-    // insert into Anchor_Box
+    // 1. check if boxNumber already exists
+    const anchorBox = await db.query(SQLQueries.FindBoxId, [boxNumber]);
+
+    if (anchorBox.rows.length > 0) {
+      res.status(400).json({ error: `box number ${boxNumber} already exists` });
+    }
+
+    // 2. create new Anchor_Box if boxNumber does not exist
     const allBoxes = await db.query(SQLQueries.CreateAnchorBox + SQLQueries.Return, [
       boxNumber,
       true,
