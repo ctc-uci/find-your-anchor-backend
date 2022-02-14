@@ -28,7 +28,6 @@ s3UploadRouter.get('/', async (req, res) => {
     const uploadURL = await s3.getSignedUrl('putObject', params);
     res.status(200).send(uploadURL);
   } catch (error) {
-    console.error(error);
     res.status(500).send(error);
   }
 });
