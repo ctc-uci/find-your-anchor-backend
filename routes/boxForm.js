@@ -1,5 +1,3 @@
-// eslint-disable no-console
-
 const router = require('express-promise-router')();
 const { db } = require('../config');
 
