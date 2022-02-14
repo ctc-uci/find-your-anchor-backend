@@ -10,4 +10,4 @@ CREATE TABLE IF NOT EXISTS public."Anchor_Box"
     launched_organically boolean,
     additional_comments text COLLATE pg_catalog."default",
     CONSTRAINT "Anchor_Box_pkey" PRIMARY KEY (box_id)
-)
+);
