@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
     ]);
     res.status(200).send(allBoxes.rows);
   } catch (error) {
-    console.error(`Error: ${error}`);
+    res.status(500).send('Status error');
   }
 });
 
