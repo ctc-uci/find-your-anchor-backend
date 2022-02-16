@@ -6,12 +6,35 @@ const { db } = require('../../config');
 boxRouter.use(express.json());
 
 // update status of pick up box
-boxRouter.put('/updateStatus', async (req, res) => {
+boxRouter.put('/relocationBoxes/update', async (req, res) => {
   try {
-    const { status, boxID } = req.body;
+    const {
+      status,
+      boxID,
+      boxHolderNameState,
+      boxHolderEmailState,
+      zipCodeState,
+      generalLocationState,
+      messageState,
+    } = req.body;
     const response = await db.query(
-      'UPDATE "Box_History" SET status = $1 WHERE box_id = $2 RETURNING *',
-      [status, boxID],
+      `UPDATE "Box_History" SET
+      status = $1,
+      boxholder_name = $3,
+      boxholder_email = $4,
+      zip_code = $5,
+      general_location = $6,
+      message = $7
+      WHERE box_id = $2 RETURNING *`,
+      [
+        status,
+        boxID,
+        boxHolderNameState,
+        boxHolderEmailState,
+        zipCodeState,
+        generalLocationState,
+        messageState,
+      ],
     );
     res.status(200).send(response);
   } catch (err) {
