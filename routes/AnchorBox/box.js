@@ -11,13 +11,16 @@ boxRouter.put('/relocationBoxes/update', async (req, res) => {
     const {
       status,
       boxID,
-      boxHolderNameState,
-      boxHolderEmailState,
-      zipCodeState,
-      generalLocationState,
-      messageState,
+      boxHolderName,
+      boxHolderEmail,
+      zipCode,
+      generalLocation,
+      message,
+      changesRequested,
+      rejectionReason,
+      messageStatus,
     } = req.body;
-    const response = await db.query(
+    let response = await db.query(
       `UPDATE "Box_History" SET
       status = $1,
       boxholder_name = $3,
@@ -26,16 +29,26 @@ boxRouter.put('/relocationBoxes/update', async (req, res) => {
       general_location = $6,
       message = $7
       WHERE box_id = $2 RETURNING *`,
-      [
-        status,
-        boxID,
-        boxHolderNameState,
-        boxHolderEmailState,
-        zipCodeState,
-        generalLocationState,
-        messageState,
-      ],
+      [status, boxID, boxHolderName, boxHolderEmail, zipCode, generalLocation, message],
     );
+    if (changesRequested !== null) {
+      response = await db.query(
+        `UPDATE "Box_History" SET changes_requested = $1 WHERE box_id = $2 RETURNING *`,
+        [changesRequested, boxID],
+      );
+    }
+    if (rejectionReason !== null) {
+      response = await db.query(
+        `UPDATE "Box_History" SET rejection_reason = $1 WHERE box_id = $2 RETURNING *`,
+        [rejectionReason, boxID],
+      );
+    }
+    if (messageStatus !== null) {
+      response = await db.query(
+        `UPDATE "Box_History" SET message_status = $1 WHERE box_id = $2 RETURNING *`,
+        [messageStatus, boxID],
+      );
+    }
     res.status(200).send(response);
   } catch (err) {
     console.error(err.message);
