@@ -26,6 +26,7 @@ router.post('/', async (req, res) => {
 
     if (anchorBox.rows.length > 0) {
       res.status(400).json({ message: `box number ${boxNumber} already exists` });
+      return;
     }
 
     // 2. create new Anchor_Box if boxNumber does not exist
