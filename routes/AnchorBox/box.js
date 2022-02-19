@@ -1,7 +1,12 @@
 const express = require('express');
 
 const boxRouter = express();
+const pgp = require('pg-promise')({});
 const { db } = require('../../config');
+
+const cn = `postgresql://${process.env.REACT_APP_DATABASE_USER}:${process.env.REACT_APP_DATABASE_PASSWORD}@${process.env.REACT_APP_DATABASE_HOST}:${process.env.REACT_APP_DATABASE_PORT}/${process.env.REACT_APP_DATABASE_NAME}?ssl=true`; // For pgp
+
+const database = pgp(cn);
 
 boxRouter.use(express.json());
 
@@ -19,36 +24,38 @@ boxRouter.put('/relocationBoxes/update', async (req, res) => {
       changesRequested,
       rejectionReason,
       messageStatus,
+      dropOffMethod,
     } = req.body;
-    let response = await db.query(
+    const response = await database.query(
       `UPDATE "Box_History" SET
-      status = $1,
-      boxholder_name = $3,
-      boxholder_email = $4,
-      zip_code = $5,
-      general_location = $6,
-      message = $7
-      WHERE box_id = $2 RETURNING *`,
-      [status, boxID, boxHolderName, boxHolderEmail, zipCode, generalLocation, message],
+      box_id = $(boxID)
+      ${status !== undefined ? ', status = $(status)' : ''}
+      ${boxHolderName !== undefined ? ', boxholder_name = $(boxHolderName)' : ''}
+      ${boxHolderEmail !== undefined ? ', boxholder_email = $(boxHolderEmail)' : ''}
+      ${zipCode !== undefined ? ', zip_code = $(zipCode)' : ''}
+      ${generalLocation !== undefined ? ', general_location = $(generalLocation)' : ''}
+      ${message !== undefined ? ', message = $(message)' : ''}
+      ${changesRequested !== undefined ? ', changes_requested = $(changesRequested)' : ''}
+      ${rejectionReason !== undefined ? ', rejection_reason = $(rejectionReason)' : ''}
+      ${messageStatus !== undefined ? ', message_status = $(messageStatus)' : ''}
+      ${dropOffMethod !== undefined ? ', drop_off_method = $(dropOffMethod)' : ''}
+      WHERE
+        box_id = $(boxID)
+      RETURNING *`,
+      {
+        status,
+        boxID,
+        boxHolderName,
+        boxHolderEmail,
+        zipCode,
+        generalLocation,
+        message,
+        changesRequested,
+        rejectionReason,
+        messageStatus,
+        dropOffMethod,
+      },
     );
-    if (changesRequested !== null) {
-      response = await db.query(
-        `UPDATE "Box_History" SET changes_requested = $1 WHERE box_id = $2 RETURNING *`,
-        [changesRequested, boxID],
-      );
-    }
-    if (rejectionReason !== null) {
-      response = await db.query(
-        `UPDATE "Box_History" SET rejection_reason = $1 WHERE box_id = $2 RETURNING *`,
-        [rejectionReason, boxID],
-      );
-    }
-    if (messageStatus !== null) {
-      response = await db.query(
-        `UPDATE "Box_History" SET message_status = $1 WHERE box_id = $2 RETURNING *`,
-        [messageStatus, boxID],
-      );
-    }
     res.status(200).send(response);
   } catch (err) {
     console.error(err.message);
@@ -59,11 +66,19 @@ boxRouter.put('/relocationBoxes/update', async (req, res) => {
 // get all boxes under a single status
 boxRouter.get('/getBoxes', async (req, res) => {
   try {
-    const { status, pickup } = req.query;
-    const allBoxes = await db.query(
-      'SELECT * FROM "Box_History" WHERE status = $1 AND (pickup = null OR pickup = $2)',
-      [status, pickup],
+    let { status, pickup } = req.query;
+    status = status === undefined ? '' : status;
+    pickup = pickup === undefined ? '' : pickup;
+    const allBoxes = await database.query(
+      `SELECT * FROM "Box_History" WHERE
+        ($(status) = '' OR status = $(status))
+      ${pickup ? 'AND pickup = $(pickup)' : ''}`,
+      {
+        status,
+        pickup,
+      },
     );
+
     res.status(200).send(allBoxes);
   } catch (err) {
     console.error(err.message);
