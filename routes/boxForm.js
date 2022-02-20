@@ -8,11 +8,10 @@ const SQLQueries = {
   Return: 'RETURNING *',
 };
 
-router.get('/exists', async (req, res) => {
+router.get('/exists/:boxId', async (req, res) => {
   try {
-    const anchorBox = await db.query(SQLQueries.FindBoxId, [req.body.boxNumber]);
+    const anchorBox = await db.query(SQLQueries.FindBoxId, [req.params.boxId]);
     if (anchorBox.rows.length > 0) {
-      console.log('EXISTS');
       return res.status(200).send(true);
     }
     return res.status(200).send(false);
