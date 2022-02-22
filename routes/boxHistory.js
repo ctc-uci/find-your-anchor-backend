@@ -2,7 +2,7 @@ const express = require('express');
 
 const boxRouter = express();
 const pgp = require('pg-promise')({});
-const { db } = require('../../config');
+const { db } = require('../config');
 
 const cn = `postgresql://${process.env.REACT_APP_DATABASE_USER}:${process.env.REACT_APP_DATABASE_PASSWORD}@${process.env.REACT_APP_DATABASE_HOST}:${process.env.REACT_APP_DATABASE_PORT}/${process.env.REACT_APP_DATABASE_NAME}?ssl=true`; // For pgp
 
@@ -43,7 +43,7 @@ const SQLQueries = {
       ($(status) = '' OR status = $(status))
       ${pickup ? 'AND pickup = $(pickup)' : ''}`,
   GetBox: 'SELECT * FROM "Box_History" WHERE box_id = $1',
-  CopyBoxInfo:
+  CopyBoxInfoToAnchorBox:
     'UPDATE "Anchor_Box" SET message = $1, zip_code = $2, picture = $3, general_location = $4, date=$5 WHERE box_id = $6',
   ApproveBox: 'UPDATE "Box_History" SET approved = TRUE, status = \'evaluated\' WHERE box_id = $1',
 };
@@ -97,7 +97,7 @@ boxRouter.put('/update', async (req, res) => {
   }
 });
 
-// get all boxes under a single status
+// get all boxes that fulfill either the status requirement or pickup requirement (or both)
 boxRouter.get('/getBoxes', async (req, res) => {
   try {
     let { status, pickup } = req.query;
@@ -125,11 +125,12 @@ boxRouter.get('/:id', async (req, res) => {
   }
 });
 
+// Approves a row in box history and then copies the relevant box information into Anchor Box
 boxRouter.put('/approveBox', async (req, res) => {
   try {
     const { boxID } = req.body;
     const approvedBox = await db.query(SQLQueries.ApproveBox + SQLQueries.Return, [boxID]);
-    await db.query(SQLQueries.CopyBoxInfo, [
+    await db.query(SQLQueries.CopyBoxInfoToAnchorBox, [
       approvedBox.rows[0].message,
       approvedBox.rows[0].zip_code,
       approvedBox.rows[0].picture,
