@@ -4,7 +4,7 @@ require('dotenv').config();
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const boxRouter = require('./routes/BoxHistory/box');
+const boxRouter = require('./routes/BoxHistory/BoxHistory');
 
 const app = express();
 
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/box', boxRouter);
+app.use('/boxHistory', boxRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
