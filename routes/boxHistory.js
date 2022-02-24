@@ -46,8 +46,9 @@ const SQLQueries = {
       ${pickup ? 'AND pickup = $(pickup)' : ''}`,
   GetBox: 'SELECT * FROM "Box_History" WHERE box_id = $1',
   CopyBoxInfoToAnchorBox:
-    'UPDATE "Anchor_Box" SET message = $1, zip_code = $2, picture = $3, general_location = $4, date=$5 WHERE box_id = $6',
-  ApproveBox: 'UPDATE "Box_History" SET approved = TRUE, status = \'evaluated\' WHERE box_id = $1',
+    'UPDATE "Anchor_Box" SET message = $1, zip_code = $2, picture = $3, general_location = $4, date=$5, launched_organically=$6 WHERE box_id = $7',
+  ApproveBoxInBoxHistory:
+    'UPDATE "Box_History" SET approved = TRUE, status = \'evaluated\' WHERE box_id = $1',
 };
 
 // update status of pick up box
@@ -131,13 +132,16 @@ boxRouter.get('/:id', async (req, res) => {
 boxRouter.put('/approveBox', async (req, res) => {
   try {
     const { boxID } = req.body;
-    const approvedBox = await db.query(SQLQueries.ApproveBox + SQLQueries.Return, [boxID]);
+    const approvedBox = await db.query(SQLQueries.ApproveBoxInBoxHistory + SQLQueries.Return, [
+      boxID,
+    ]);
     await db.query(SQLQueries.CopyBoxInfoToAnchorBox, [
       approvedBox.rows[0].message,
       approvedBox.rows[0].zip_code,
       approvedBox.rows[0].picture,
       approvedBox.rows[0].general_location,
       approvedBox.rows[0].date,
+      approvedBox.rows[0].launched_organically,
       approvedBox.rows[0].box_id,
     ]);
     res.status(200).send('Successfully approved box');
