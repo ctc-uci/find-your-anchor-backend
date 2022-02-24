@@ -24,10 +24,10 @@ app.use(
   }),
 );
 
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+//   next();
+// });
 
 app.use('/boxHistory', boxRouter);
 app.use('/boxForm', boxFormRouter);

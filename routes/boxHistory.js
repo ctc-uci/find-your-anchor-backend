@@ -21,7 +21,7 @@ const SQLQueries = {
     changesRequested,
     rejectionReason,
     messageStatus,
-    dropOffMethod,
+    launchedOrganically,
   ) =>
     `UPDATE "Box_History" SET
         box_id = $(boxID)
@@ -34,7 +34,9 @@ const SQLQueries = {
         ${changesRequested !== undefined ? ', changes_requested = $(changesRequested)' : ''}
         ${rejectionReason !== undefined ? ', rejection_reason = $(rejectionReason)' : ''}
         ${messageStatus !== undefined ? ', message_status = $(messageStatus)' : ''}
-        ${dropOffMethod !== undefined ? ', drop_off_method = $(dropOffMethod)' : ''}
+        ${
+          launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
+        }
         WHERE
           box_id = $(boxID)`,
   Return: 'Returning *',
@@ -62,7 +64,7 @@ boxRouter.put('/update', async (req, res) => {
       changesRequested,
       rejectionReason,
       messageStatus,
-      dropOffMethod,
+      launchedOrganically,
     } = req.body;
     const response = await database.query(
       SQLQueries.UpdateBox(
@@ -75,7 +77,7 @@ boxRouter.put('/update', async (req, res) => {
         changesRequested,
         rejectionReason,
         messageStatus,
-        dropOffMethod,
+        launchedOrganically,
       ) + SQLQueries.Return,
       {
         status,
@@ -88,7 +90,7 @@ boxRouter.put('/update', async (req, res) => {
         changesRequested,
         rejectionReason,
         messageStatus,
-        dropOffMethod,
+        launchedOrganically,
       },
     );
     res.status(200).send(response);
@@ -98,7 +100,7 @@ boxRouter.put('/update', async (req, res) => {
 });
 
 // get all boxes that fulfill either the status requirement or pickup requirement (or both)
-boxRouter.get('/getBoxes', async (req, res) => {
+boxRouter.get('/', async (req, res) => {
   try {
     let { status, pickup } = req.query;
     status = status === undefined ? '' : status;
