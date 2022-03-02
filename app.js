@@ -9,7 +9,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const boxFormRouter = require('./routes/boxForm');
 const s3UploadRouter = require('./routes/s3upload');
 const userRouter = require('./routes/users');
-const { authRouter, verifyToken } = require('./routes/auth');
+const { authRouter } = require('./routes/auth');
 
 const app = express();
 // body parser middleware
@@ -27,8 +27,8 @@ app.use(
   }),
 );
 
-app.use('/boxForm', [verifyToken, boxFormRouter]);
-app.use('/s3Upload', [verifyToken, s3UploadRouter]);
+app.use('/boxForm', boxFormRouter);
+app.use('/s3Upload', s3UploadRouter);
 app.use('/users', userRouter);
 app.use('/auth', authRouter);
 

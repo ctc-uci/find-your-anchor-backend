@@ -3,7 +3,7 @@ const express = require('express');
 
 const userRouter = express();
 const admin = require('../firebase');
-const pool = require('../config');
+const { db } = require('../config');
 
 userRouter.use(express.json());
 
@@ -11,7 +11,7 @@ const SQLQueries = {
   GetAllUsers: `SELECT * FROM "Users"`,
   GetSpecificUser: 'SELECT * FROM "Users" WHERE user_id = $1',
   DeleteUser: 'DELETE FROM "Users" WHERE user_id = $1',
-  CreateUser: 'INSERT INTO "Users" (email, user_id) VALUES ($1, $2)',
+  CreateUser: 'INSERT INTO "Users" (first_name, last_name, email, user_id) VALUES ($1, $2, $3, $4)',
   Return: ' RETURNING *',
 };
 
@@ -24,7 +24,7 @@ const isAlphaNumeric = (value) => {
 // Get all users
 userRouter.get('/', async (req, res) => {
   try {
-    const user = await pool.query(SQLQueries.GetAllUsers);
+    const user = await db.query(SQLQueries.GetAllUsers);
     res.send({
       account: user.rows,
     });
@@ -39,7 +39,7 @@ userRouter.get('/:userId', async (req, res) => {
     const { userId } = req.params;
     isAlphaNumeric(userId); // ID must be alphanumeric
 
-    const user = await pool.query(SQLQueries.GetSpecificUser, [userId]);
+    const user = await db.query(SQLQueries.GetSpecificUser, [userId]);
     res.send({
       user: user.rows[0],
     });
@@ -57,7 +57,7 @@ userRouter.delete('/:userId', async (req, res) => {
     // Firebase delete
     await admin.auth().deleteUser(userId);
     // DB delete
-    await pool.query(SQLQueries.DeleteUser, [userId]);
+    await db.query(SQLQueries.DeleteUser, [userId]);
 
     res.status(200).send(`Deleted user with ID: ${userId}`);
   } catch (err) {
@@ -68,11 +68,14 @@ userRouter.delete('/:userId', async (req, res) => {
 // Add user to database
 userRouter.post('/create', async (req, res) => {
   try {
-    const { email, userId } = req.body;
+    const { firstName, lastName, email, userId } = req.body;
     isAlphaNumeric(userId); // ID must be alphanumeric
-
-    const newUser = await pool.query(SQLQueries.CreateUser + SQLQueries.Return, [email, userId]);
-
+    const newUser = await db.query(SQLQueries.CreateUser + SQLQueries.Return, [
+      firstName,
+      lastName,
+      email,
+      userId,
+    ]);
     res.status(200).send({
       newUser: newUser.rows[0],
     });
