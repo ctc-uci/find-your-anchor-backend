@@ -5,6 +5,7 @@ require('dotenv').config();
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
+const boxRouter = require('./routes/boxHistory');
 const boxFormRouter = require('./routes/boxForm');
 const s3UploadRouter = require('./routes/s3upload');
 
@@ -23,6 +24,12 @@ app.use(
   }),
 );
 
+// app.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+//   next();
+// });
+
+app.use('/boxHistory', boxRouter);
 app.use('/boxForm', boxFormRouter);
 app.use('/s3Upload', s3UploadRouter);
 
