@@ -2064,13 +2064,6 @@ pgpass@1.x:
   dependencies:
     split2 "^3.1.1"
 
-pgpromise@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/pgpromise/-/pgpromise-0.1.1.tgz#394688f19faab8558ab3f4591c6790357f953254"
-  integrity sha1-OUaI8Z+quFWKs/RZHGeQNX+VMlQ=
-  dependencies:
-    q "~1.0.0"
-
 picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.2.3:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.0.tgz#f1f061de8f6a4bf022892e2d128234fb98302972"
@@ -2176,11 +2169,6 @@ pupa@^2.1.1:
   integrity sha512-l1jNAspIBSFqbT+y+5FosojNpVpF94nlI+wDUpqP9enwOTfHx9f0gh5nB96vl+6yTpsJsypeNrwfzPrKuHB41A==
   dependencies:
     escape-goat "^2.0.0"
-
-q@~1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/q/-/q-1.0.1.tgz#11872aeedee89268110b10a718448ffb10112a14"
-  integrity sha1-EYcq7t7okmgRCxCnGESP+xARKhQ=
 
 qs@6.7.0:
   version "6.7.0"

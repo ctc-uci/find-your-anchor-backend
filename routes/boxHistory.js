@@ -100,6 +100,78 @@ boxRouter.put('/update', async (req, res) => {
   }
 });
 
+// Adds a box to the Box History table
+boxRouter.post('/', async (req, res) => {
+  try {
+    const {
+      boxID,
+      message,
+      boxholderEmail,
+      boxholderName,
+      generalLocation,
+      picture,
+      approved,
+      status,
+      pickup,
+      changesRequested,
+      rejectionReason,
+      messageStatus,
+      zipcode,
+      date,
+      launchedOrganically,
+    } = req.body;
+    const requiredParams = [
+      'boxID',
+      'boxholderEmail',
+      'picture',
+      'approved',
+      'status',
+      'pickup',
+      'zipcode',
+      'date',
+    ];
+    const missingParams = requiredParams.every((param) =>
+      Object.prototype.hasOwnProperty.call(req.body, param),
+    );
+    if (!missingParams) return res.status(400).send('Missing a required parameter');
+    const insertedBox = await database.query(
+      `INSERT INTO "Box_History" (
+        box_id, message, boxholder_email, boxholder_name,
+        general_location, picture, approved, status,
+        pickup, changes_requested, rejection_reason, message_status,
+        zip_code, date, launched_organically
+      )
+      VALUES (
+        $(boxID), $(message), $(boxholderEmail), $(boxholderName),
+        $(generalLocation), $(picture), $(approved), $(status),
+        $(pickup), $(changesRequested), $(rejectionReason), $(messageStatus),
+        $(zipcode), $(date), $(launchedOrganically)
+      )
+      RETURNING *;`,
+      {
+        boxID,
+        message,
+        boxholderEmail,
+        boxholderName,
+        generalLocation,
+        picture,
+        approved,
+        status,
+        pickup,
+        changesRequested,
+        rejectionReason,
+        messageStatus,
+        zipcode,
+        date,
+        launchedOrganically,
+      },
+    );
+    return res.status(200).send(insertedBox);
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+});
+
 // get all boxes that fulfill either the status requirement or pickup requirement (or both)
 boxRouter.get('/', async (req, res) => {
   try {
