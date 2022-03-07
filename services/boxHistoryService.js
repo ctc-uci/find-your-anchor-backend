@@ -86,4 +86,52 @@ const updateBox = async (
   return res;
 };
 
-module.exports = { getBoxByID, getBoxesWithStatusOrPickup, updateBox };
+const approveBoxInBoxHistory = async (id) => {
+  let res = null;
+  try {
+    res = await db.query(
+      `UPDATE "Box_History"
+      SET approved = TRUE, status = 'evaluated'
+      WHERE box_id = $1
+      RETURNING *;`,
+      [id],
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
+const copyBoxInfoToAnchorBox = async (
+  message,
+  zipCode,
+  picture,
+  generalLocation,
+  date,
+  launchedOrganically,
+  boxID,
+) => {
+  let res = null;
+  try {
+    res = await db.query(
+      `UPDATE "Anchor_Box"
+      SET message = $1, zip_code = $2,
+        picture = $3, general_location = $4,
+        date=$5, launched_organically=$6
+      WHERE
+        box_id = $7`,
+      [message, zipCode, picture, generalLocation, date, launchedOrganically, boxID],
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
+module.exports = {
+  getBoxByID,
+  getBoxesWithStatusOrPickup,
+  updateBox,
+  approveBoxInBoxHistory,
+  copyBoxInfoToAnchorBox,
+};
