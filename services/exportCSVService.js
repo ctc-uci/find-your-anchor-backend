@@ -48,7 +48,9 @@ const zipcodeToSQL = (zipCode) => {
 };
 
 const boxDetailsToSQL = (boxDetails) => {
-  return boxDetails.length > 0 ? boxDetails.join(', ') : '*';
+  return boxDetails.length > 0
+    ? boxDetails.join(', ')
+    : 'date, box_id, zip_code, picture, general_location, launched_organically, message';
 };
 
 module.exports = {
