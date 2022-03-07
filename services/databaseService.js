@@ -76,29 +76,33 @@ const getBoxesByFilters = async (req) => {
     boxDetails,
   } = req;
 
-  const whereClauseConditions = [];
-  if (boxOption === 'boxes-custom') {
-    whereClauseConditions.push(boxesToSQL(boxRange));
-  }
-  if (zipOption === 'zip-code-custom') {
-    whereClauseConditions.push(zipcodeToSQL(zipCode));
-  }
-  if (dateOption === 'date-single') {
-    whereClauseConditions.push(`date = ${singleDate}`);
-  } else if (dateOption === 'date-range') {
-    whereClauseConditions.push(`date BETWEEN ${startDate} AND ${endDate}`);
-  }
-  whereClauseConditions.push(`launched_organically = ${launchOrg === 'yes'}`);
+  try {
+    const whereClauseConditions = [];
+    if (boxOption === 'boxes-custom') {
+      whereClauseConditions.push(boxesToSQL(boxRange));
+    }
+    if (zipOption === 'zip-code-custom') {
+      whereClauseConditions.push(zipcodeToSQL(zipCode));
+    }
+    if (dateOption === 'date-single') {
+      whereClauseConditions.push(`date = ${singleDate}`);
+    } else if (dateOption === 'date-range') {
+      whereClauseConditions.push(`date BETWEEN ${startDate} AND ${endDate}`);
+    }
+    whereClauseConditions.push(`launched_organically = ${launchOrg === 'yes'}`);
 
-  const whereClauseSQL = whereClauseConditions.join(' AND '); // combine all the conditions in the where clause
-  const orderBySQL = sortbyToSQL(sortBy);
-  const selectClauseSQL = boxDetailsToSQL(boxDetails);
+    const whereClauseSQL = whereClauseConditions.join(' AND '); // combine all the conditions in the where clause
+    const orderBySQL = sortbyToSQL(sortBy);
+    const selectClauseSQL = boxDetailsToSQL(boxDetails);
 
-  const res = await db.query(
-    SQLQueries.GetBoxesByFilters(selectClauseSQL, whereClauseSQL, orderBySQL),
-  );
+    const res = await db.query(
+      SQLQueries.GetBoxesByFilters(selectClauseSQL, whereClauseSQL, orderBySQL),
+    );
 
-  return res.rows;
+    return res.rows;
+  } catch (err) {
+    throw new Error(err.message);
+  }
 };
 
 const createBox = async (req) => {
