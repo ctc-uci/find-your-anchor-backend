@@ -25,7 +25,6 @@ router.post('/', async (req, res) => {
     // 2. create new Anchor_Box if boxNumber does not exist
     const allBoxes = await createAnchorBox(
       boxNumber,
-      true,
       message,
       zipCode,
       picture,

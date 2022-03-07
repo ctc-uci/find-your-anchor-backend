@@ -19,7 +19,6 @@ const findBoxId = async (id) => {
 
 const createAnchorBox = async (
   boxNumber,
-  approved,
   message,
   zipCode,
   picture,
@@ -32,14 +31,13 @@ const createAnchorBox = async (
   try {
     res = await db.query(
       `INSERT INTO "Anchor_Box"
-        (box_id, approved, message,
+        (box_id, message,
         zip_code, picture, general_location,
         date, launched_organically, additional_comments)
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *;`,
       [
         boxNumber,
-        approved,
         message,
         zipCode,
         picture,
