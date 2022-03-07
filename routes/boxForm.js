@@ -3,7 +3,7 @@ const { db } = require('../config');
 
 const SQLQueries = {
   CreateAnchorBox:
-    'INSERT INTO "Anchor_Box"(box_id, approved, message, zip_code, picture, general_location, date, launched_organically, additional_comments) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
+    'INSERT INTO "Anchor_Box"(box_id, message, zip_code, picture, general_location, date, launched_organically, additional_comments) VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
   FindBoxId: 'SELECT box_id FROM "Anchor_Box" WHERE box_id = $1',
   Return: 'RETURNING *',
 };
@@ -32,7 +32,6 @@ router.post('/', async (req, res) => {
     // 2. create new Anchor_Box if boxNumber does not exist
     const allBoxes = await db.query(SQLQueries.CreateAnchorBox + SQLQueries.Return, [
       boxNumber,
-      true,
       message,
       zipCode,
       picture,
