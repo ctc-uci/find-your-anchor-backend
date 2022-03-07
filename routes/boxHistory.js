@@ -22,6 +22,7 @@ const SQLQueries = {
     rejectionReason,
     messageStatus,
     launchedOrganically,
+    imageStatus,
   ) =>
     `UPDATE "Box_History" SET
         box_id = $(boxID)
@@ -37,6 +38,7 @@ const SQLQueries = {
         ${
           launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
         }
+        ${imageStatus !== undefined ? ', image_status = $(imageStatus)' : ''}
         WHERE
           box_id = $(boxID)`,
   Return: 'Returning *',
@@ -66,6 +68,7 @@ boxRouter.put('/update', async (req, res) => {
       rejectionReason,
       messageStatus,
       launchedOrganically,
+      imageStatus,
     } = req.body;
     const response = await database.query(
       SQLQueries.UpdateBox(
@@ -79,6 +82,7 @@ boxRouter.put('/update', async (req, res) => {
         rejectionReason,
         messageStatus,
         launchedOrganically,
+        imageStatus,
       ) + SQLQueries.Return,
       {
         status,
@@ -92,6 +96,7 @@ boxRouter.put('/update', async (req, res) => {
         rejectionReason,
         messageStatus,
         launchedOrganically,
+        imageStatus,
       },
     );
     res.status(200).send(response);
