@@ -35,7 +35,8 @@ const boxesToSQL = (boxRange) => {
       boxIdsSQL.push(`box_id = ${valTrimmed}`);
     }
   });
-  return boxIdsSQL.join(' OR ');
+  /* eslint-disable prefer-template */
+  return '(' + boxIdsSQL.join(' OR ') + ')';
 };
 
 const zipcodeToSQL = (zipCode) => {
