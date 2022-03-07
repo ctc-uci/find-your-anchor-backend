@@ -130,10 +130,10 @@ boxRouter.post('/', async (req, res) => {
       'zipcode',
       'date',
     ];
-    const missingParams = requiredParams.every((param) =>
+    const missingParams = !requiredParams.every((param) =>
       Object.prototype.hasOwnProperty.call(req.body, param),
     );
-    if (!missingParams) return res.status(400).send('Missing a required parameter');
+    if (missingParams) return res.status(400).send('Missing a required parameter');
     const insertedBox = await database.query(
       `INSERT INTO "Box_History" (
         box_id, message, boxholder_email, boxholder_name,
