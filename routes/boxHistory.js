@@ -110,7 +110,6 @@ boxRouter.post('/', async (req, res) => {
       boxholderName,
       generalLocation,
       picture,
-      approved,
       status,
       pickup,
       changesRequested,
@@ -120,20 +119,21 @@ boxRouter.post('/', async (req, res) => {
       date,
       launchedOrganically,
     } = req.body;
-    const requiredParams = [
-      'boxID',
-      'boxholderEmail',
-      'picture',
-      'approved',
-      'status',
-      'pickup',
-      'zipcode',
-      'date',
-    ];
+    // Check for required parameters
+    const requiredParams = ['boxID', 'boxholderEmail', 'zipcode', 'date'];
     const missingParams = !requiredParams.every((param) =>
       Object.prototype.hasOwnProperty.call(req.body, param),
     );
     if (missingParams) return res.status(400).send('Missing a required parameter');
+    // Check if box exists in anchor box
+    const matchingBox = await database.query(
+      `
+        SELECT box_id FROM "Anchor_Box"
+        WHERE box_id = $(boxID);
+      `,
+      { boxID },
+    );
+    if (matchingBox.length === 0) return res.status(400).send('Could not a find box with that ID');
     const insertedBox = await database.query(
       `INSERT INTO "Box_History" (
         box_id, message, boxholder_email, boxholder_name,
@@ -155,7 +155,7 @@ boxRouter.post('/', async (req, res) => {
         boxholderName,
         generalLocation,
         picture,
-        approved,
+        approved: false,
         status,
         pickup,
         changesRequested,
