@@ -5,7 +5,7 @@ const SQLQueries = {
     `SELECT ${selectClauseSQL} FROM "Anchor_Box" WHERE ${whereClauseSQL} ORDER BY ${orderBySQL}`,
 };
 
-// helper functions not related to querying the database
+// the following are helper functions
 const sortbyToSQL = (sortBy) => {
   switch (sortBy) {
     case 'ascend-box-num':
