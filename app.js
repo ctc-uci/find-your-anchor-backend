@@ -6,6 +6,7 @@ require('dotenv').config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const boxFormRouter = require('./routes/boxForm');
+const exportCSVRouter = require('./routes/exportCSV');
 const s3UploadRouter = require('./routes/s3upload');
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(
 );
 
 app.use('/boxForm', boxFormRouter);
+app.use('/exportCSV', exportCSVRouter);
 app.use('/s3Upload', s3UploadRouter);
 
 app.listen(PORT, () => {
