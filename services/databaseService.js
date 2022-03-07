@@ -92,7 +92,10 @@ const getBoxesByFilters = async (req) => {
   const whereClauseSQL = whereClauseConditions.join(' AND ');
 
   // select clause
-  const selectClauseSQL = boxDetails.length === 0 ? '*' : 'box_id';
+  let selectClauseSQL = '*';
+  if (boxDetails.length > 0) {
+    selectClauseSQL = boxDetails.join(', ');
+  }
 
   const res = await db.query(
     SQLQueries.GetBoxesByFilters(selectClauseSQL, whereClauseSQL, orderBySQL),
