@@ -5,10 +5,57 @@ const SQLQueries = {
     'INSERT INTO "Anchor_Box"(box_id, approved, message, zip_code, picture, general_location, date, launched_organically, additional_comments) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)',
   FindBoxId: 'SELECT box_id FROM "Anchor_Box" WHERE box_id = $1',
   GetBoxesByFilters: (selectClauseSQL, whereClauseSQL, orderBySQL) =>
-    `SELECT ${selectClauseSQL} FROM "Anchor_Box WHERE ${whereClauseSQL} ORDER BY ${orderBySQL}`,
+    `SELECT ${selectClauseSQL} FROM "Anchor_Box" WHERE ${whereClauseSQL} ORDER BY ${orderBySQL}`,
   Return: 'RETURNING *',
 };
 
+// helper functions not related to querying the database
+const sortbyToSQL = (sortBy) => {
+  switch (sortBy) {
+    case 'ascend-box-num':
+      return 'box_id ASC';
+    case 'descend-box-num':
+      return 'box_id DESC';
+    case 'chronologic':
+      return 'date ASC';
+    case 'ascend-zip-code':
+      return 'zip_code ASC';
+    case 'descend-zip-code':
+      return 'zip_code DESC';
+    default:
+      return 'box_id ASC';
+  }
+};
+
+const boxesToSQL = (boxRange) => {
+  const boxIdsSQL = [];
+  const values = boxRange.split(',');
+  values.forEach((val) => {
+    const valTrimmed = val.trim();
+    if (valTrimmed.includes('-')) {
+      const range = valTrimmed.split('-');
+      boxIdsSQL.push(`box_id BETWEEN ${range[0]} AND ${range[1]}`);
+    } else {
+      boxIdsSQL.push(`box_id = ${valTrimmed}`);
+    }
+  });
+  return boxIdsSQL.join(' OR ');
+};
+
+const zipcodeToSQL = (zipCode) => {
+  const zipCodesSQL = [];
+  const values = zipCode.split(',');
+  values.forEach((val) => {
+    zipCodesSQL.push(`'${val.trim()}'`);
+  });
+  return `zip_code IN (${zipCodesSQL.join(', ')})`;
+};
+
+const boxDetailsToSQL = (boxDetails) => {
+  return boxDetails.length > 0 ? boxDetails.join(', ') : '*';
+};
+
+// functions for querying the database
 const getBoxById = async (boxId) => {
   const res = await db.query(SQLQueries.FindBoxId, [boxId]);
   return res.rows;
@@ -29,73 +76,23 @@ const getBoxesByFilters = async (req) => {
     boxDetails,
   } = req;
 
-  let orderBySQL = 'ORDER BY ';
-  switch (sortBy) {
-    case 'ascend-box-num':
-      orderBySQL += 'box_id ASC';
-      break;
-    case 'descend-box-num':
-      orderBySQL += 'box_id DESC';
-      break;
-    case 'chronologic':
-      orderBySQL += 'date ASC';
-      break;
-    case 'ascend-zip-code':
-      orderBySQL += 'zip_code ASC';
-      break;
-    case 'descend-zip-code':
-      orderBySQL += 'zip_code DESC';
-      break;
-    default:
-      break;
-  }
-
   const whereClauseConditions = [];
-
-  // box option
   if (boxOption === 'boxes-custom') {
-    const boxIdsSQL = [];
-    const values = boxRange.split(',');
-    values.forEach((val) => {
-      const valTrimmed = val.trim();
-      if (valTrimmed.includes('-')) {
-        const range = valTrimmed.split('-');
-        boxIdsSQL.push(`box_id BETWEEN ${range[0]} AND ${range[1]}`);
-      } else {
-        boxIdsSQL.push(`box_id = ${valTrimmed}`);
-      }
-    });
-    whereClauseConditions.push(boxIdsSQL.join(' OR '));
+    whereClauseConditions.push(boxesToSQL(boxRange));
   }
-
-  // zip code option
   if (zipOption === 'zip-code-custom') {
-    const zipCodesSQL = [];
-    const values = zipCode.split(',');
-    values.forEach((val) => {
-      zipCodesSQL.push(`'${val.trim()}'`);
-    });
-    whereClauseConditions.push(`zip_code IN (${zipCodesSQL.join(', ')})`);
+    whereClauseConditions.push(zipcodeToSQL(zipCode));
   }
-
-  // launched organically option
-  whereClauseConditions.push(launchOrg === 'yes');
-
-  // date option
   if (dateOption === 'date-single') {
     whereClauseConditions.push(`date = ${singleDate}`);
   } else if (dateOption === 'date-range') {
     whereClauseConditions.push(`date BETWEEN ${startDate} AND ${endDate}`);
   }
+  whereClauseConditions.push(`launched_organically = ${launchOrg === 'yes'}`);
 
-  // combine all predicates
-  const whereClauseSQL = whereClauseConditions.join(' AND ');
-
-  // select clause
-  let selectClauseSQL = '*';
-  if (boxDetails.length > 0) {
-    selectClauseSQL = boxDetails.join(', ');
-  }
+  const whereClauseSQL = whereClauseConditions.join(' AND '); // combine all the conditions in the where clause
+  const orderBySQL = sortbyToSQL(sortBy);
+  const selectClauseSQL = boxDetailsToSQL(boxDetails);
 
   const res = await db.query(
     SQLQueries.GetBoxesByFilters(selectClauseSQL, whereClauseSQL, orderBySQL),

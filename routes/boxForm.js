@@ -11,7 +11,7 @@ router.get('/:boxId', async (req, res) => {
 });
 
 // get boxes by filters
-router.get('/:boxes', async (req, res) => {
+router.post('/boxFilters', async (req, res) => {
   try {
     return res.status(200).send(await dbService.getBoxesByFilters(req.body));
   } catch (err) {
