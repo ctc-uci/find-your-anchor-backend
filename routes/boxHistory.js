@@ -38,7 +38,7 @@ const SQLQueries = {
           launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
         }
         WHERE
-          box_id = $(boxID)`,
+          transaction_id = $(transactionID)`,
   Return: 'Returning *',
   GetBoxes: (pickup) =>
     `SELECT * FROM "Box_History" WHERE
@@ -46,9 +46,9 @@ const SQLQueries = {
       ${pickup ? 'AND pickup = $(pickup)' : ''}`,
   GetBox: 'SELECT * FROM "Box_History" WHERE box_id = $1',
   CopyBoxInfoToAnchorBox:
-    'UPDATE "Anchor_Box" SET message = $1, zip_code = $2, picture = $3, general_location = $4, date=$5, launched_organically=$6 WHERE box_id = $7',
+    'UPDATE "Anchor_Box" SET message = $1, zip_code = $2, picture = $3, general_location = $4, date=$5, launched_organically=$6 WHERE transaction_id = $7',
   ApproveBoxInBoxHistory:
-    'UPDATE "Box_History" SET approved = TRUE, status = \'evaluated\' WHERE box_id = $1',
+    'UPDATE "Box_History" SET approved = TRUE, status = \'evaluated\' WHERE transaction_id = $1',
 };
 
 // update status of pick up box
@@ -57,6 +57,7 @@ boxRouter.put('/update', async (req, res) => {
     const {
       status,
       boxID,
+      transactionID,
       boxHolderName,
       boxHolderEmail,
       zipCode,
@@ -83,6 +84,7 @@ boxRouter.put('/update', async (req, res) => {
       {
         status,
         boxID,
+        transactionID,
         boxHolderName,
         boxHolderEmail,
         zipCode,
@@ -114,10 +116,10 @@ boxRouter.get('/', async (req, res) => {
 });
 
 // get a box
-boxRouter.get('/:id', async (req, res) => {
-  const { id } = req.params;
+boxRouter.get('/:transactionID', async (req, res) => {
+  const { transactionID } = req.params;
   try {
-    const box = await db.query(SQLQueries.GetBox, [id]);
+    const box = await db.query(SQLQueries.GetBox, [transactionID]);
     if (box.length === 0) {
       res.status(400).send(box);
     } else {
@@ -131,9 +133,9 @@ boxRouter.get('/:id', async (req, res) => {
 // Approves a row in box history and then copies the relevant box information into Anchor Box
 boxRouter.put('/approveBox', async (req, res) => {
   try {
-    const { boxID } = req.body;
+    const { transactionID } = req.body;
     const approvedBox = await db.query(SQLQueries.ApproveBoxInBoxHistory + SQLQueries.Return, [
-      boxID,
+      transactionID,
     ]);
     await db.query(SQLQueries.CopyBoxInfoToAnchorBox, [
       approvedBox.rows[0].message,
@@ -142,7 +144,7 @@ boxRouter.put('/approveBox', async (req, res) => {
       approvedBox.rows[0].general_location,
       approvedBox.rows[0].date,
       approvedBox.rows[0].launched_organically,
-      approvedBox.rows[0].box_id,
+      approvedBox.rows[0].transactionID,
     ]);
     res.status(200).send('Successfully approved box');
   } catch (err) {
