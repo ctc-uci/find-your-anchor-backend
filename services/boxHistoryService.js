@@ -146,15 +146,6 @@ const addBox = async (
 ) => {
   let res = null;
   try {
-    // Check if box exists in anchor box
-    const matchingBox = await db.query(
-      `
-        SELECT box_id FROM "Anchor_Box"
-        WHERE box_id = $(boxID);
-      `,
-      { boxID },
-    );
-    if (matchingBox.length === 0) return res.status(400).send('Could not a find box with that ID');
     res = await db.query(
       `INSERT INTO "Box_History" (
         box_id, message, boxholder_email, boxholder_name,
