@@ -1,12 +1,5 @@
 const router = require('express-promise-router')();
-const { db } = require('../config');
-
-const SQLQueries = {
-  CreateAnchorBox:
-    'INSERT INTO "Anchor_Box"(box_id, message, zip_code, picture, general_location, date, launched_organically, additional_comments) VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
-  FindBoxId: 'SELECT box_id FROM "Anchor_Box" WHERE box_id = $1',
-  Return: 'RETURNING *',
-};
+const { findBoxId, createAnchorBox } = require('../services/boxFormService');
 
 router.post('/', async (req, res) => {
   try {
@@ -22,15 +15,15 @@ router.post('/', async (req, res) => {
     } = req.body;
 
     // 1. check if boxNumber already exists
-    const anchorBox = await db.query(SQLQueries.FindBoxId, [boxNumber]);
+    const anchorBox = await findBoxId(boxNumber);
 
-    if (anchorBox.rows.length > 0) {
+    if (anchorBox.length > 0) {
       res.status(400).json({ message: `box number ${boxNumber} already exists` });
       return;
     }
 
     // 2. create new Anchor_Box if boxNumber does not exist
-    const allBoxes = await db.query(SQLQueries.CreateAnchorBox + SQLQueries.Return, [
+    const allBoxes = await createAnchorBox(
       boxNumber,
       message,
       zipCode,
@@ -39,8 +32,8 @@ router.post('/', async (req, res) => {
       date,
       launchedOrganically,
       additionalComments,
-    ]);
-    res.status(200).send(allBoxes.rows);
+    );
+    res.status(200).send(allBoxes);
   } catch (error) {
     res.status(500).send(error);
   }
