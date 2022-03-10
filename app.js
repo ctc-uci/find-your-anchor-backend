@@ -5,7 +5,7 @@ require('dotenv').config();
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const boxRouter = require('./routes/boxHistory');
+const boxHistoryRouter = require('./routes/boxHistory');
 const boxFormRouter = require('./routes/boxForm');
 const s3UploadRouter = require('./routes/s3upload');
 const emailRouter = require('./routes/nodeMailer');
@@ -25,7 +25,7 @@ app.use(
   }),
 );
 
-app.use('/boxHistory', boxRouter);
+app.use('/boxHistory', boxHistoryRouter);
 app.use('/boxForm', boxFormRouter);
 app.use('/s3Upload', s3UploadRouter);
 app.use('/nodemailer', emailRouter);
