@@ -25,16 +25,11 @@ app.use(
   }),
 );
 
-// app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
-//   next();
-// });
-
 app.use('/boxHistory', boxRouter);
 app.use('/boxForm', boxFormRouter);
 app.use('/s3Upload', s3UploadRouter);
 app.use('/nodemailer', emailRouter);
 
 app.listen(PORT, () => {
-  // console.log(`Server listening on ${PORT}`);
+  console.log(`Server listening on ${PORT}`);
 });
