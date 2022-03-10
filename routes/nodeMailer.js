@@ -7,7 +7,6 @@ emailRouter.use(express.json());
 
 emailRouter.post('/send', (req, res) => {
   const { email, messageHtml } = req.body;
-
   const mail = {
     from: `Bob Ross bobross69pogchamp@gmail.com`,
     to: email,
@@ -16,15 +15,10 @@ emailRouter.post('/send', (req, res) => {
   };
 
   transporter.sendMail(mail, (err) => {
-    // console.log(data);
     if (err) {
-      res.json({
-        msg: 'fail',
-      });
+      res.status(400).send('Fail');
     } else {
-      res.json({
-        msg: 'success',
-      });
+      res.status(200).send('Success');
     }
   });
 });
