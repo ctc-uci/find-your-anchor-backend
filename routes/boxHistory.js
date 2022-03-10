@@ -7,6 +7,7 @@ const {
   copyBoxInfoToAnchorBox,
   addBox,
 } = require('../services/boxHistoryService');
+const { findBoxId } = require('../services/boxFormService');
 
 const boxRouter = express();
 boxRouter.use(express.json());
@@ -73,7 +74,7 @@ boxRouter.post('/', async (req, res) => {
     if (missingParams) return res.status(400).send('Missing a required parameter');
 
     // Check if box exists in anchor box
-    const matchingBox = await getBoxByID(boxID);
+    const matchingBox = await findBoxId(boxID);
     if (matchingBox.length === 0) return res.status(400).send('Could not a find box with that ID');
 
     const response = await addBox(
