@@ -1,15 +1,14 @@
 const nodemailer = require('nodemailer');
-const cred = require('./emailConfig.json');
 
 require('dotenv').config();
 
 const transport = {
   host: 'smtp.gmail.com', // e.g. smtp.gmail.com
   auth: {
-    user: cred.username,
-    pass: cred.password,
+    user: process.env.REACT_APP_EMAIL_USERNAME,
+    pass: process.env.REACT_APP_EMAIL_PASSWORD,
   },
-  from: cred.username,
+  from: process.env.REACT_APP_EMAIL_USERNAME,
   secure: true,
 };
 
