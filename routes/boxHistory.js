@@ -80,9 +80,6 @@ boxHistoryRouter.get('/:transactionID', async (req, res) => {
 boxHistoryRouter.put('/approveBox', async (req, res) => {
   try {
     const { transactionID } = req.body;
-    // const approvedBox = await db.query(SQLQueries.ApproveBoxInBoxHistory + SQLQueries.Return, [
-    //   transactionID,
-    // ]);
     const approvedBox = await approveTransactionInBoxHistory(transactionID);
     await copyTransactionInfoToAnchorBox(
       approvedBox.rows[0].message,
