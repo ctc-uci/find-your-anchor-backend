@@ -16,5 +16,6 @@ CREATE TABLE IF NOT EXISTS public."Box_History"
     zip_code character varying COLLATE pg_catalog."default",
     date character varying COLLATE pg_catalog."default",
     launched_organically boolean,
+    image_status character varying(255) COLLATE pg_catalog."default",
     CONSTRAINT "Box_History_pkey1" PRIMARY KEY (transaction_id)
 );

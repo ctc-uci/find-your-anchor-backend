@@ -65,6 +65,7 @@ boxRouter.post('/', async (req, res) => {
       zipcode,
       date,
       launchedOrganically,
+      imageStatus,
     } = req.body;
     // Check for required parameters
     const requiredParams = ['boxID', 'boxholderEmail', 'zipcode', 'date'];
@@ -92,6 +93,7 @@ boxRouter.post('/', async (req, res) => {
       zipcode,
       date,
       launchedOrganically,
+      imageStatus,
     );
     return res.status(200).send(response);
   } catch (err) {

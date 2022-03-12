@@ -143,6 +143,7 @@ const addBox = async (
   zipcode,
   date,
   launchedOrganically,
+  imageStatus,
 ) => {
   let res = null;
   try {
@@ -151,13 +152,13 @@ const addBox = async (
         box_id, message, boxholder_email, boxholder_name,
         general_location, picture, approved, status,
         pickup, changes_requested, rejection_reason, message_status,
-        zip_code, date, launched_organically
+        zip_code, date, launched_organically, image_status
       )
       VALUES (
         $(boxID), $(message), $(boxholderEmail), $(boxholderName),
         $(generalLocation), $(picture), $(approved), $(status),
         $(pickup), $(changesRequested), $(rejectionReason), $(messageStatus),
-        $(zipcode), $(date), $(launchedOrganically)
+        $(zipcode), $(date), $(launchedOrganically), $(imageStatus)
       )
       RETURNING *;`,
       {
@@ -176,6 +177,7 @@ const addBox = async (
         zipcode,
         date,
         launchedOrganically,
+        imageStatus,
       },
     );
   } catch (err) {
