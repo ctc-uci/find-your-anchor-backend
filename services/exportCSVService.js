@@ -81,7 +81,9 @@ module.exports = {
       if (dateOption === 'date-single') {
         whereClauseConditions.push(`date = ${singleDate}`);
       } else if (dateOption === 'date-range') {
-        whereClauseConditions.push(`date BETWEEN ${startDate} AND ${endDate}`);
+        whereClauseConditions.push(
+          `TO_DATE(date, 'MM/DD/YYYY') BETWEEN (DATE '${startDate}') AND (DATE '${endDate}')`,
+        );
       }
       whereClauseConditions.push(`launched_organically = ${launchOrg === 'yes'}`);
 
