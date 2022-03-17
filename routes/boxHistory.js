@@ -16,6 +16,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
   try {
     const {
       status,
+      approved,
       boxID,
       transactionID,
       boxHolderName,
@@ -30,6 +31,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
     } = req.body;
     const response = await updateBox(
       status,
+      approved,
       boxID,
       transactionID,
       boxHolderName,

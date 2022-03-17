@@ -24,7 +24,9 @@ const getBoxesWithStatusOrPickup = async (status, pickup) => {
       `SELECT * FROM "Box_History"
       WHERE
         ($(status) = '' OR status = $(status))
-        ${pickup ? 'AND pickup = $(pickup)' : ''};`,
+        ${pickup ? 'AND pickup = $(pickup)' : ''}
+      ORDER BY
+        pickup, box_id;`,
       { status, pickup },
     );
   } catch (err) {
@@ -35,6 +37,7 @@ const getBoxesWithStatusOrPickup = async (status, pickup) => {
 
 const updateBox = async (
   status,
+  approved,
   boxID,
   transactionID,
   boxHolderName,
@@ -53,6 +56,7 @@ const updateBox = async (
       `UPDATE "Box_History" SET
         box_id = $(boxID)
         ${status !== undefined ? ', status = $(status)' : ''}
+        ${approved !== undefined ? ', approved = $(approved)' : ''}
         ${boxHolderName !== undefined ? ', boxholder_name = $(boxHolderName)' : ''}
         ${boxHolderEmail !== undefined ? ', boxholder_email = $(boxHolderEmail)' : ''}
         ${zipCode !== undefined ? ', zip_code = $(zipCode)' : ''}
@@ -69,6 +73,7 @@ const updateBox = async (
       RETURNING *`,
       {
         status,
+        approved,
         boxID,
         transactionID,
         boxHolderName,
