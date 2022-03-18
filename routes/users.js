@@ -12,6 +12,7 @@ const SQLQueries = {
   GetSpecificUser: 'SELECT * FROM "Users" WHERE user_id = $1',
   DeleteUser: 'DELETE FROM "Users" WHERE user_id = $1',
   CreateUser: 'INSERT INTO "Users" (first_name, last_name, email, user_id) VALUES ($1, $2, $3, $4)',
+  UpdateUser: 'UPDATE "Users" SET first_name = $1, last_name = $2 WHERE user_id = $3',
   Return: ' RETURNING *',
 };
 
@@ -74,6 +75,24 @@ userRouter.post('/create', async (req, res) => {
       firstName,
       lastName,
       email,
+      userId,
+    ]);
+    res.status(200).send({
+      newUser: newUser.rows[0],
+    });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// Add user to database
+userRouter.put('/:userId', async (req, res) => {
+  try {
+    const { firstName, lastName, userId } = req.body;
+    isAlphaNumeric(userId); // ID must be alphanumeric
+    const newUser = await db.query(SQLQueries.UpdateUser + SQLQueries.Return, [
+      firstName,
+      lastName,
       userId,
     ]);
     res.status(200).send({
