@@ -214,3 +214,6 @@ dist
 
 # Firebase SDK
 firebase-adminsdk.json
+
+# Email credentials
+emailConfig.json
