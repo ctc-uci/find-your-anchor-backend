@@ -36,4 +36,15 @@ adminInviteRouter.get('/:inviteId', async (req, res) => {
   }
 });
 
+// Delete an admin invite XD
+adminInviteRouter.delete('/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    await db.query(`DELETE from "Admin_Invite" WHERE email = $1`, [email]);
+    res.send(`Deleted user with email ${email}`);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
 module.exports = adminInviteRouter;
