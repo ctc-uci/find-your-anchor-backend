@@ -91,8 +91,6 @@ userRouter.post('/create', async (req, res) => {
       password,
     });
 
-    console.log(user);
-
     const newUser = await db.query(SQLQueries.CreateUser + SQLQueries.Return, [
       firstName,
       lastName,
