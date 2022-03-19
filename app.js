@@ -12,6 +12,7 @@ const s3UploadRouter = require('./routes/s3upload');
 const userRouter = require('./routes/users');
 const { authRouter } = require('./routes/auth');
 const emailRouter = require('./routes/nodeMailer');
+const adminInviteRouter = require('./routes/adminInvite');
 
 const app = express();
 // body parser middleware
@@ -35,6 +36,7 @@ app.use('/s3Upload', s3UploadRouter);
 app.use('/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/nodemailer', emailRouter);
+app.use('/adminInvite', adminInviteRouter);
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);

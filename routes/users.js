@@ -69,14 +69,23 @@ userRouter.delete('/:userId', async (req, res) => {
 // Add user to database
 userRouter.post('/create', async (req, res) => {
   try {
-    const { firstName, lastName, email, userId } = req.body;
-    isAlphaNumeric(userId); // ID must be alphanumeric
+    const { firstName, lastName, email, password } = req.body;
+
+    const user = await admin.auth().createUser({
+      email,
+      emailVerified: true,
+      password,
+    });
+
+    console.log(user);
+
     const newUser = await db.query(SQLQueries.CreateUser + SQLQueries.Return, [
       firstName,
       lastName,
       email,
-      userId,
+      user.uid,
     ]);
+
     res.status(200).send({
       newUser: newUser.rows[0],
     });
