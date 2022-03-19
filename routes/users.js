@@ -9,7 +9,8 @@ userRouter.use(express.json());
 
 const SQLQueries = {
   GetAllUsers: `SELECT * FROM "Users"`,
-  GetSpecificUser: 'SELECT * FROM "Users" WHERE user_id = $1',
+  GetSpecificUserByUserId: 'SELECT * FROM "Users" WHERE user_id = $1',
+  GetSpecificUserByEmail: 'SELECT * FROM "Users" WHERE email = $1',
   DeleteUser: 'DELETE FROM "Users" WHERE user_id = $1',
   CreateUser: 'INSERT INTO "Users" (first_name, last_name, email, user_id) VALUES ($1, $2, $3, $4)',
   UpdateUser: 'UPDATE "Users" SET first_name = $1, last_name = $2 WHERE user_id = $3',
@@ -35,12 +36,25 @@ userRouter.get('/', async (req, res) => {
 });
 
 // Get a specific user by ID
-userRouter.get('/:userId', async (req, res) => {
+userRouter.get('/userId/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     isAlphaNumeric(userId); // ID must be alphanumeric
 
-    const user = await db.query(SQLQueries.GetSpecificUser, [userId]);
+    const user = await db.query(SQLQueries.GetSpecificUserByUserId, [userId]);
+    res.send({
+      user: user.rows[0],
+    });
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
+// Gets a specific user by email
+userRouter.get('/email/:email', async (req, res) => {
+  try {
+    const { email } = req.params;
+    const user = await db.query(SQLQueries.GetSpecificUserByEmail, [email]);
     res.send({
       user: user.rows[0],
     });
