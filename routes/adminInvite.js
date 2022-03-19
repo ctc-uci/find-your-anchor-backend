@@ -25,14 +25,13 @@ adminInviteRouter.get('/:inviteId', async (req, res) => {
   try {
     const { inviteId } = req.params;
     const admin = await db.query(
-      'SELECT * FROM "Admin_Invite" WHERE invite_id = $1 AND valid_invite = TRUE',
+      'SELECT * FROM "Admin_Invite" WHERE invite_id = $1 AND valid_invite = TRUE AND NOW() < expire_time',
       [inviteId],
     );
     res.send({
       admin: admin.rows[0],
     });
   } catch (err) {
-    console.log(err);
     res.status(400).send(err.message);
   }
 });
