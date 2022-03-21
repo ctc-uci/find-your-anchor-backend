@@ -1,62 +1,24 @@
 const express = require('express');
 
-const boxRouter = express();
-const pgp = require('pg-promise')({});
-const { db } = require('../config');
+const boxHistoryRouter = express();
+const {
+  updateBox,
+  getTransactionByID,
+  getBoxesWithStatusOrPickup,
+  approveTransactionInBoxHistory,
+  copyTransactionInfoToAnchorBox,
+} = require('../services/boxHistoryService');
 
-const cn = `postgresql://${process.env.REACT_APP_DATABASE_USER}:${process.env.REACT_APP_DATABASE_PASSWORD}@${process.env.REACT_APP_DATABASE_HOST}:${process.env.REACT_APP_DATABASE_PORT}/${process.env.REACT_APP_DATABASE_NAME}?ssl=true`; // For pgp
-
-const database = pgp(cn);
-
-boxRouter.use(express.json());
-
-const SQLQueries = {
-  UpdateBox: (
-    status,
-    boxHolderName,
-    boxHolderEmail,
-    zipCode,
-    generalLocation,
-    message,
-    changesRequested,
-    rejectionReason,
-    messageStatus,
-    launchedOrganically,
-  ) =>
-    `UPDATE "Box_History" SET
-        box_id = $(boxID)
-        ${status !== undefined ? ', status = $(status)' : ''}
-        ${boxHolderName !== undefined ? ', boxholder_name = $(boxHolderName)' : ''}
-        ${boxHolderEmail !== undefined ? ', boxholder_email = $(boxHolderEmail)' : ''}
-        ${zipCode !== undefined ? ', zip_code = $(zipCode)' : ''}
-        ${generalLocation !== undefined ? ', general_location = $(generalLocation)' : ''}
-        ${message !== undefined ? ', message = $(message)' : ''}
-        ${changesRequested !== undefined ? ', changes_requested = $(changesRequested)' : ''}
-        ${rejectionReason !== undefined ? ', rejection_reason = $(rejectionReason)' : ''}
-        ${messageStatus !== undefined ? ', message_status = $(messageStatus)' : ''}
-        ${
-          launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
-        }
-        WHERE
-          box_id = $(boxID)`,
-  Return: 'Returning *',
-  GetBoxes: (pickup) =>
-    `SELECT * FROM "Box_History" WHERE
-      ($(status) = '' OR status = $(status))
-      ${pickup ? 'AND pickup = $(pickup)' : ''}`,
-  GetBox: 'SELECT * FROM "Box_History" WHERE box_id = $1',
-  CopyBoxInfoToAnchorBox:
-    'UPDATE "Anchor_Box" SET message = $1, zip_code = $2, picture = $3, general_location = $4, date=$5, launched_organically=$6 WHERE box_id = $7',
-  ApproveBoxInBoxHistory:
-    'UPDATE "Box_History" SET approved = TRUE, status = \'evaluated\' WHERE box_id = $1',
-};
+boxHistoryRouter.use(express.json());
 
 // update status of pick up box
-boxRouter.put('/update', async (req, res) => {
+boxHistoryRouter.put('/update', async (req, res) => {
   try {
     const {
       status,
+      approved,
       boxID,
+      transactionID,
       boxHolderName,
       boxHolderEmail,
       zipCode,
@@ -67,32 +29,20 @@ boxRouter.put('/update', async (req, res) => {
       messageStatus,
       launchedOrganically,
     } = req.body;
-    const response = await database.query(
-      SQLQueries.UpdateBox(
-        status,
-        boxHolderName,
-        boxHolderEmail,
-        zipCode,
-        generalLocation,
-        message,
-        changesRequested,
-        rejectionReason,
-        messageStatus,
-        launchedOrganically,
-      ) + SQLQueries.Return,
-      {
-        status,
-        boxID,
-        boxHolderName,
-        boxHolderEmail,
-        zipCode,
-        generalLocation,
-        message,
-        changesRequested,
-        rejectionReason,
-        messageStatus,
-        launchedOrganically,
-      },
+    const response = await updateBox(
+      status,
+      approved,
+      boxID,
+      transactionID,
+      boxHolderName,
+      boxHolderEmail,
+      zipCode,
+      generalLocation,
+      message,
+      changesRequested,
+      rejectionReason,
+      messageStatus,
+      launchedOrganically,
     );
     res.status(200).send(response);
   } catch (err) {
@@ -101,12 +51,12 @@ boxRouter.put('/update', async (req, res) => {
 });
 
 // get all boxes that fulfill either the status requirement or pickup requirement (or both)
-boxRouter.get('/', async (req, res) => {
+boxHistoryRouter.get('/', async (req, res) => {
   try {
     let { status, pickup } = req.query;
     status = status === undefined ? '' : status;
     pickup = pickup === undefined ? '' : pickup;
-    const allBoxes = await database.query(SQLQueries.GetBoxes(pickup), { status, pickup });
+    const allBoxes = await getBoxesWithStatusOrPickup(status, pickup);
     res.status(200).send(allBoxes);
   } catch (err) {
     res.status(500).send(err.message);
@@ -114,10 +64,10 @@ boxRouter.get('/', async (req, res) => {
 });
 
 // get a box
-boxRouter.get('/:id', async (req, res) => {
-  const { id } = req.params;
+boxHistoryRouter.get('/:transactionID', async (req, res) => {
+  const { transactionID } = req.params;
   try {
-    const box = await db.query(SQLQueries.GetBox, [id]);
+    const box = await getTransactionByID(transactionID);
     if (box.length === 0) {
       res.status(400).send(box);
     } else {
@@ -129,25 +79,23 @@ boxRouter.get('/:id', async (req, res) => {
 });
 
 // Approves a row in box history and then copies the relevant box information into Anchor Box
-boxRouter.put('/approveBox', async (req, res) => {
+boxHistoryRouter.put('/approveBox', async (req, res) => {
   try {
-    const { boxID } = req.body;
-    const approvedBox = await db.query(SQLQueries.ApproveBoxInBoxHistory + SQLQueries.Return, [
-      boxID,
-    ]);
-    await db.query(SQLQueries.CopyBoxInfoToAnchorBox, [
+    const { transactionID } = req.body;
+    const approvedBox = await approveTransactionInBoxHistory(transactionID);
+    await copyTransactionInfoToAnchorBox(
       approvedBox.rows[0].message,
       approvedBox.rows[0].zip_code,
       approvedBox.rows[0].picture,
       approvedBox.rows[0].general_location,
       approvedBox.rows[0].date,
       approvedBox.rows[0].launched_organically,
-      approvedBox.rows[0].box_id,
-    ]);
+      approvedBox.rows[0].transactionID,
+    );
     res.status(200).send('Successfully approved box');
   } catch (err) {
     res.status(500).send(err.message);
   }
 });
 
-module.exports = boxRouter;
+module.exports = boxHistoryRouter;
