@@ -1,6 +1,24 @@
 const anchorBoxRouter = require('express-promise-router')();
-const { findBoxId, createAnchorBox, deleteAnchorBox } = require('../services/anchorBoxService');
+const {
+  findBoxId,
+  createAnchorBox,
+  deleteAnchorBox,
+  getAnchorBoxesByLocation,
+} = require('../services/anchorBoxService');
 
+anchorBoxRouter.get('/', async (req, res) => {
+  try {
+    const { zipCode, country } = req.query;
+    if (zipCode === undefined || country === undefined) {
+      res.status(400).send('Invalid search queries');
+      return;
+    }
+    const anchorBoxes = await getAnchorBoxesByLocation(zipCode, country);
+    res.status(200).send(anchorBoxes);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
 anchorBoxRouter.post('/', async (req, res) => {
   try {
     const {

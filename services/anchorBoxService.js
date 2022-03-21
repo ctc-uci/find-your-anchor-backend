@@ -3,6 +3,19 @@ const pgp = require('pg-promise')({});
 const cn = `postgresql://${process.env.REACT_APP_DATABASE_USER}:${process.env.REACT_APP_DATABASE_PASSWORD}@${process.env.REACT_APP_DATABASE_HOST}:${process.env.REACT_APP_DATABASE_PORT}/${process.env.REACT_APP_DATABASE_NAME}?ssl=true`; // For pgp
 const db = pgp(cn);
 
+const getAnchorBoxesByLocation = async (zipCode, country) => {
+  let res = null;
+  try {
+    res = await db.query('SELECT * FROM "Anchor_Box" WHERE zip_code = $1 AND country = $2', [
+      zipCode,
+      country,
+    ]);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
 const findBoxId = async (id) => {
   let res = null;
   try {
@@ -63,4 +76,4 @@ const deleteAnchorBox = async (boxID) => {
   return res;
 };
 
-module.exports = { findBoxId, createAnchorBox, deleteAnchorBox };
+module.exports = { findBoxId, createAnchorBox, deleteAnchorBox, getAnchorBoxesByLocation };
