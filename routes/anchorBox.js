@@ -1,7 +1,7 @@
-const router = require('express-promise-router')();
-const { findBoxId, createAnchorBox } = require('../services/boxFormService');
+const anchorBoxRouter = require('express-promise-router')();
+const { findBoxId, createAnchorBox, deleteAnchorBox } = require('../services/anchorBoxService');
 
-router.post('/', async (req, res) => {
+anchorBoxRouter.post('/', async (req, res) => {
   try {
     const {
       boxNumber,
@@ -39,4 +39,14 @@ router.post('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+anchorBoxRouter.delete('/:boxId', async (req, res) => {
+  try {
+    const { boxId } = req.params;
+    const response = await deleteAnchorBox(boxId);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+module.exports = anchorBoxRouter;

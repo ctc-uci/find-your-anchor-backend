@@ -53,4 +53,14 @@ const createAnchorBox = async (
   return res;
 };
 
-module.exports = { findBoxId, createAnchorBox };
+const deleteAnchorBox = async (boxID) => {
+  let res = null;
+  try {
+    res = await db.queryA('DELETE FROM "Anchor_Box" WHERE box_id = $1 RETURNING *;', [boxID]);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
+module.exports = { findBoxId, createAnchorBox, deleteAnchorBox };
