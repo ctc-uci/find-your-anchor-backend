@@ -6,10 +6,10 @@ const db = pgp(cn);
 const getAnchorBoxesByLocation = async (zipCode, country) => {
   let res = null;
   try {
-    res = await db.query('SELECT * FROM "Anchor_Box" WHERE zip_code = $1 AND country = $2', [
-      zipCode,
-      country,
-    ]);
+    res = await db.query(
+      'SELECT * FROM "Anchor_Box" WHERE zip_code = $1 AND country = $2 AND show_on_map = TRUE',
+      [zipCode, country],
+    );
   } catch (err) {
     throw new Error(err.message);
   }
@@ -69,11 +69,44 @@ const createAnchorBox = async (
 const deleteAnchorBox = async (boxID) => {
   let res = null;
   try {
-    res = await db.queryA('DELETE FROM "Anchor_Box" WHERE box_id = $1 RETURNING *;', [boxID]);
+    res = await db.query('DELETE FROM "Anchor_Box" WHERE box_id = $1 RETURNING *;', [boxID]);
   } catch (err) {
     throw new Error(err.message);
   }
   return res;
 };
 
-module.exports = { findBoxId, createAnchorBox, deleteAnchorBox, getAnchorBoxesByLocation };
+const updateAnchorBox = async (boxID, showOnMap) => {
+  let res = null;
+  try {
+    res = await db.query(
+      'UPDATE "Anchor_Box" SET show_on_map = $2 WHERE box_id = $1 RETURNING *;',
+      [boxID, showOnMap],
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
+const getAllAnchorBoxes = async () => {
+  let res = null;
+  try {
+    res = await db.query(
+      `SELECT * FROM "Anchor_Box"
+      WHERE show_on_map=TRUE`,
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
+module.exports = {
+  findBoxId,
+  createAnchorBox,
+  deleteAnchorBox,
+  getAnchorBoxesByLocation,
+  updateAnchorBox,
+  getAllAnchorBoxes,
+};

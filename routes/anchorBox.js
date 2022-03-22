@@ -4,13 +4,16 @@ const {
   createAnchorBox,
   deleteAnchorBox,
   getAnchorBoxesByLocation,
+  updateAnchorBox,
+  getAllAnchorBoxes,
 } = require('../services/anchorBoxService');
 
 anchorBoxRouter.get('/', async (req, res) => {
   try {
     const { zipCode, country } = req.query;
     if (zipCode === undefined || country === undefined) {
-      res.status(400).send('Invalid search queries');
+      const anchorBoxes = await getAllAnchorBoxes();
+      res.status(200).send(anchorBoxes);
       return;
     }
     const anchorBoxes = await getAnchorBoxesByLocation(zipCode, country);
@@ -19,6 +22,7 @@ anchorBoxRouter.get('/', async (req, res) => {
     res.status(400).send(error);
   }
 });
+
 anchorBoxRouter.post('/', async (req, res) => {
   try {
     const {
@@ -67,4 +71,13 @@ anchorBoxRouter.delete('/:boxId', async (req, res) => {
   }
 });
 
+anchorBoxRouter.put('/update', async (req, res) => {
+  try {
+    const { boxID, showOnMap } = req.body;
+    const response = await updateAnchorBox(boxID, showOnMap);
+    res.status(200).send(response);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
 module.exports = anchorBoxRouter;

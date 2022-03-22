@@ -116,7 +116,9 @@ const copyTransactionInfoToAnchorBox = async (
   generalLocation,
   date,
   launchedOrganically,
-  transactionID,
+  boxID,
+  latitude,
+  longitude,
 ) => {
   let res = null;
   try {
@@ -124,10 +126,33 @@ const copyTransactionInfoToAnchorBox = async (
       `UPDATE "Anchor_Box"
       SET message = $1, zip_code = $2,
         picture = $3, general_location = $4,
-        date=$5, launched_organically=$6
+        date=$5, launched_organically=$6, latitude=$8, longitude=$9, show_on_map=TRUE
       WHERE
-        transaction_id = $7`,
-      [message, zipCode, picture, generalLocation, date, launchedOrganically, transactionID],
+        box_id = $7`,
+      [
+        message,
+        zipCode,
+        picture,
+        generalLocation,
+        date,
+        launchedOrganically,
+        boxID,
+        latitude,
+        longitude,
+      ],
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
+const getHistoryOfBox = async (boxID) => {
+  let res = null;
+  try {
+    res = await db.query(
+      'SELECT * FROM "Box_History" WHERE status = \'evaluated\' AND approved = TRUE AND box_id = $1 AND pickup = FALSE ORDER BY date DESC',
+      [boxID],
     );
   } catch (err) {
     throw new Error(err.message);
@@ -137,6 +162,7 @@ const copyTransactionInfoToAnchorBox = async (
 
 module.exports = {
   getTransactionByID,
+  getHistoryOfBox,
   getBoxesWithStatusOrPickup,
   updateBox,
   approveTransactionInBoxHistory,

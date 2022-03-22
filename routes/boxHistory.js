@@ -7,6 +7,7 @@ const {
   getBoxesWithStatusOrPickup,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
+  getHistoryOfBox,
 } = require('../services/boxHistoryService');
 
 boxHistoryRouter.use(express.json());
@@ -64,7 +65,7 @@ boxHistoryRouter.get('/', async (req, res) => {
 });
 
 // get a box
-boxHistoryRouter.get('/:transactionID', async (req, res) => {
+boxHistoryRouter.get('/transaction/:transactionID', async (req, res) => {
   const { transactionID } = req.params;
   try {
     const box = await getTransactionByID(transactionID);
@@ -78,10 +79,21 @@ boxHistoryRouter.get('/:transactionID', async (req, res) => {
   }
 });
 
+// Gets a box's history
+boxHistoryRouter.get('/history/:boxID', async (req, res) => {
+  const { boxID } = req.params;
+  try {
+    const history = await getHistoryOfBox(boxID);
+    res.status(200).send(history);
+  } catch (err) {
+    res.status(400).send(err.message);
+  }
+});
+
 // Approves a row in box history and then copies the relevant box information into Anchor Box
 boxHistoryRouter.put('/approveBox', async (req, res) => {
   try {
-    const { transactionID } = req.body;
+    const { transactionID, latitude, longitude } = req.body;
     const approvedBox = await approveTransactionInBoxHistory(transactionID);
     await copyTransactionInfoToAnchorBox(
       approvedBox.rows[0].message,
@@ -90,7 +102,9 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
       approvedBox.rows[0].general_location,
       approvedBox.rows[0].date,
       approvedBox.rows[0].launched_organically,
-      approvedBox.rows[0].transactionID,
+      approvedBox.rows[0].box_id,
+      latitude,
+      longitude,
     );
     res.status(200).send('Successfully approved box');
   } catch (err) {
