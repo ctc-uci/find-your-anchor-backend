@@ -1,18 +1,19 @@
 const express = require('express');
 
 const adminInviteRouter = express();
-const { db } = require('../config');
+const {
+  addAdminInvite,
+  getAdminInvite,
+  deleteAdminInvite,
+} = require('../services/adminInviteService');
 
 adminInviteRouter.use(express.json());
 
 adminInviteRouter.post('/', async (req, res) => {
   const { email, inviteId } = req.body;
   try {
-    const admin = await db.query(
-      'INSERT INTO "Admin_Invite" (email, invite_id, expire_time, valid_invite) VALUES ($1, $2, NOW() + INTERVAL \'7 days\', $3)',
-      [email, inviteId, true],
-    );
-    res.send({
+    const admin = await addAdminInvite(email, inviteId);
+    res.status(200).send({
       admin: admin.rows[0],
     });
   } catch (err) {
@@ -24,24 +25,21 @@ adminInviteRouter.post('/', async (req, res) => {
 adminInviteRouter.get('/:inviteId', async (req, res) => {
   try {
     const { inviteId } = req.params;
-    const admin = await db.query(
-      'SELECT * FROM "Admin_Invite" WHERE invite_id = $1 AND valid_invite = TRUE AND NOW() < expire_time',
-      [inviteId],
-    );
-    res.send({
-      admin: admin.rows[0],
+    const admin = await getAdminInvite(inviteId);
+    res.status(200).send({
+      admin: admin[0],
     });
   } catch (err) {
     res.status(400).send(err.message);
   }
 });
 
-// Delete an admin invite XD
+// Delete an admin invite
 adminInviteRouter.delete('/:email', async (req, res) => {
   try {
     const { email } = req.params;
-    await db.query(`DELETE from "Admin_Invite" WHERE email = $1`, [email]);
-    res.send(`Deleted user with email ${email}`);
+    await deleteAdminInvite(email);
+    res.status(200).send(`Deleted user with email ${email}`);
   } catch (err) {
     res.status(400).send(err.message);
   }
