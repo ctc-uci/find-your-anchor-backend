@@ -9,4 +9,4 @@ const db = pgp({
   ssl: true,
 });
 
-module.exports = { db };
+module.exports = db;

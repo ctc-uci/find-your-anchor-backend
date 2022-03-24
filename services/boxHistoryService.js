@@ -1,7 +1,4 @@
-const pgp = require('pg-promise')({});
-
-const cn = `postgresql://${process.env.REACT_APP_DATABASE_USER}:${process.env.REACT_APP_DATABASE_PASSWORD}@${process.env.REACT_APP_DATABASE_HOST}:${process.env.REACT_APP_DATABASE_PORT}/${process.env.REACT_APP_DATABASE_NAME}?ssl=true`; // For pgp
-const db = pgp(cn);
+const db = require('../config');
 
 const getTransactionByID = async (transactionID) => {
   let res = null;
