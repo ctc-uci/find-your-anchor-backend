@@ -6,6 +6,7 @@ const {
   getAnchorBoxesByLocation,
   updateAnchorBox,
   getAllAnchorBoxes,
+  getAllLocationInfo,
 } = require('../services/anchorBoxService');
 
 anchorBoxRouter.get('/', async (req, res) => {
@@ -18,6 +19,15 @@ anchorBoxRouter.get('/', async (req, res) => {
     }
     const anchorBoxes = await getAnchorBoxesByLocation(zipCode, country);
     res.status(200).send(anchorBoxes);
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+anchorBoxRouter.get('/locations', async (req, res) => {
+  try {
+    const locationInfo = await getAllLocationInfo();
+    res.status(200).send(locationInfo);
   } catch (error) {
     res.status(400).send(error);
   }

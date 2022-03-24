@@ -102,6 +102,19 @@ const getAllAnchorBoxes = async () => {
   return res;
 };
 
+const getAllLocationInfo = async () => {
+  let res = null;
+  try {
+    res = await db.query(
+      `SELECT DISTINCT zip_code, country, latitude, longitude, COUNT (box_id) AS box_count FROM "Anchor_Box"
+      WHERE show_on_map=TRUE GROUP BY zip_code, country, latitude, longitude`,
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
 module.exports = {
   findBoxId,
   createAnchorBox,
@@ -109,4 +122,5 @@ module.exports = {
   getAnchorBoxesByLocation,
   updateAnchorBox,
   getAllAnchorBoxes,
+  getAllLocationInfo,
 };
