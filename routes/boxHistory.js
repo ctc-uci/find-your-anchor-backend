@@ -1,23 +1,28 @@
 const express = require('express');
+
+const boxHistoryRouter = express();
 const {
-  getBoxByID,
-  getBoxesWithStatusOrPickup,
   updateBox,
   approveBoxInBoxHistory,
   copyBoxInfoToAnchorBox,
   addBox,
+  getTransactionByID,
+  getBoxesWithStatusOrPickup,
+  approveTransactionInBoxHistory,
+  copyTransactionInfoToAnchorBox,
 } = require('../services/boxHistoryService');
 const { findBoxId } = require('../services/boxFormService');
 
-const boxRouter = express();
-boxRouter.use(express.json());
+boxHistoryRouter.use(express.json());
 
 // update status of pick up box
-boxRouter.put('/update', async (req, res) => {
+boxHistoryRouter.put('/update', async (req, res) => {
   try {
     const {
       status,
+      approved,
       boxID,
+      transactionID,
       boxHolderName,
       boxHolderEmail,
       zipCode,
@@ -27,10 +32,13 @@ boxRouter.put('/update', async (req, res) => {
       rejectionReason,
       messageStatus,
       launchedOrganically,
+      imageStatus,
     } = req.body;
     const response = await updateBox(
       status,
+      approved,
       boxID,
+      transactionID,
       boxHolderName,
       boxHolderEmail,
       zipCode,
@@ -40,6 +48,7 @@ boxRouter.put('/update', async (req, res) => {
       rejectionReason,
       messageStatus,
       launchedOrganically,
+      imageStatus,
     );
     res.status(200).send(response);
   } catch (err) {
@@ -102,7 +111,7 @@ boxRouter.post('/', async (req, res) => {
 });
 
 // get all boxes that fulfill either the status requirement or pickup requirement (or both)
-boxRouter.get('/', async (req, res) => {
+boxHistoryRouter.get('/', async (req, res) => {
   try {
     let { status, pickup } = req.query;
     status = status === undefined ? '' : status;
@@ -114,11 +123,11 @@ boxRouter.get('/', async (req, res) => {
   }
 });
 
-// get a box by id
-boxRouter.get('/:id', async (req, res) => {
-  const { id } = req.params;
+// get a box
+boxHistoryRouter.get('/:transactionID', async (req, res) => {
+  const { transactionID } = req.params;
   try {
-    const box = await getBoxByID(id);
+    const box = await getTransactionByID(transactionID);
     if (box.length === 0) {
       res.status(400).send(box);
     } else {
@@ -130,18 +139,18 @@ boxRouter.get('/:id', async (req, res) => {
 });
 
 // Approves a row in box history and then copies the relevant box information into Anchor Box
-boxRouter.put('/approveBox', async (req, res) => {
+boxHistoryRouter.put('/approveBox', async (req, res) => {
   try {
-    const { boxID } = req.body;
-    const approvedBox = await approveBoxInBoxHistory(boxID);
-    await copyBoxInfoToAnchorBox(
-      approvedBox[0].message,
-      approvedBox[0].zip_code,
-      approvedBox[0].picture,
-      approvedBox[0].general_location,
-      approvedBox[0].date,
-      approvedBox[0].launched_organically,
-      approvedBox[0].box_id,
+    const { transactionID } = req.body;
+    const approvedBox = await approveTransactionInBoxHistory(transactionID);
+    await copyTransactionInfoToAnchorBox(
+      approvedBox.rows[0].message,
+      approvedBox.rows[0].zip_code,
+      approvedBox.rows[0].picture,
+      approvedBox.rows[0].general_location,
+      approvedBox.rows[0].date,
+      approvedBox.rows[0].launched_organically,
+      approvedBox.rows[0].transactionID,
     );
     res.status(200).send('Successfully approved box');
   } catch (err) {
@@ -149,4 +158,4 @@ boxRouter.put('/approveBox', async (req, res) => {
   }
 });
 
-module.exports = boxRouter;
+module.exports = boxHistoryRouter;
