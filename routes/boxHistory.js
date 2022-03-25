@@ -3,8 +3,6 @@ const express = require('express');
 const boxHistoryRouter = express();
 const {
   updateBox,
-  approveBoxInBoxHistory,
-  copyBoxInfoToAnchorBox,
   addBox,
   getTransactionByID,
   getBoxesWithStatusOrPickup,
@@ -57,7 +55,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
 });
 
 // Adds a box to the Box History table
-boxRouter.post('/', async (req, res) => {
+boxHistoryRouter.post('/', async (req, res) => {
   try {
     const {
       boxID,

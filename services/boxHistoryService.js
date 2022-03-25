@@ -197,8 +197,6 @@ module.exports = {
   getTransactionByID,
   getBoxesWithStatusOrPickup,
   updateBox,
-  approveBoxInBoxHistory,
-  copyBoxInfoToAnchorBox,
   addBox,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
