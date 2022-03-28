@@ -46,6 +46,7 @@ const updateBox = async (
   rejectionReason,
   messageStatus,
   launchedOrganically,
+  imageStatus,
 ) => {
   let res = null;
   try {
@@ -65,6 +66,7 @@ const updateBox = async (
         ${
           launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
         }
+        ${imageStatus !== undefined ? ', image_status = $(imageStatus)' : ''}
       WHERE
         transaction_id = $(transactionID)
       RETURNING *`,
@@ -82,6 +84,7 @@ const updateBox = async (
         rejectionReason,
         messageStatus,
         launchedOrganically,
+        imageStatus,
       },
     );
   } catch (err) {

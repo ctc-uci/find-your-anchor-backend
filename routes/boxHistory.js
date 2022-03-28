@@ -29,6 +29,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       rejectionReason,
       messageStatus,
       launchedOrganically,
+      imageStatus,
     } = req.body;
     const response = await updateBox(
       status,
@@ -44,6 +45,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       rejectionReason,
       messageStatus,
       launchedOrganically,
+      imageStatus,
     );
     res.status(200).send(response);
   } catch (err) {

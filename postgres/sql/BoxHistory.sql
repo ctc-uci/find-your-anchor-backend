@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS public."Box_History"
     approved boolean,
     status character varying COLLATE pg_catalog."default",
     pickup boolean,
+    image_status character varying(255) COLLATE pg_catalog."default",
     changes_requested character varying COLLATE pg_catalog."default",
     rejection_reason character varying COLLATE pg_catalog."default",
     message_status character varying COLLATE pg_catalog."default",
