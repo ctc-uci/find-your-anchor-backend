@@ -1,4 +1,4 @@
-const { db } = require('../config');
+const db = require('../config');
 
 const getAnchorBoxesByLocation = async (zipCode, country) => {
   let res = null;
