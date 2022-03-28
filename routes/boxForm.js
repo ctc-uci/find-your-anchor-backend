@@ -1,41 +1,32 @@
 const router = require('express-promise-router')();
-const { findBoxId, createAnchorBox } = require('../services/boxFormService');
+const boxFormService = require('../services/boxFormService');
 
-router.post('/', async (req, res) => {
+router.get('/:boxId', async (req, res) => {
   try {
-    const {
-      boxNumber,
-      date,
-      zipCode,
-      boxLocation,
-      message,
-      picture,
-      additionalComments,
-      launchedOrganically,
-    } = req.body;
-
-    // 1. check if boxNumber already exists
-    const anchorBox = await findBoxId(boxNumber);
-
-    if (anchorBox.length > 0) {
-      res.status(400).json({ message: `box number ${boxNumber} already exists` });
-      return;
-    }
-
-    // 2. create new Anchor_Box if boxNumber does not exist
-    const allBoxes = await createAnchorBox(
-      boxNumber,
-      message,
-      zipCode,
-      picture,
-      boxLocation,
-      date,
-      launchedOrganically,
-      additionalComments,
-    );
-    res.status(200).send(allBoxes);
+    return res.status(200).send(await boxFormService.getBoxById(req.params.boxId));
   } catch (error) {
-    res.status(500).send(error);
+    return res.status(500).send(error);
+  }
+});
+
+router.post('/boxes', (req, res) => {
+  try {
+    const formDatas = req.body;
+    formDatas.forEach(async (formData) => {
+      await boxFormService.createBox(formData);
+    });
+    return res.status(200).send('upload success');
+  } catch (err) {
+    return res.status(500).send(err.message);
+  }
+});
+
+router.post('/box', async (req, res) => {
+  try {
+    const boxes = await boxFormService.createBox(req.body);
+    return res.status(200).send(boxes);
+  } catch (err) {
+    return res.status(500).send(err.message);
   }
 });
 
