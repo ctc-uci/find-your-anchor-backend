@@ -119,6 +119,8 @@ const copyTransactionInfoToAnchorBox = async (
   boxID,
   latitude,
   longitude,
+  boxHolderName,
+  boxHolderEmail,
 ) => {
   let res = null;
   try {
@@ -126,7 +128,8 @@ const copyTransactionInfoToAnchorBox = async (
       `UPDATE "Anchor_Box"
       SET message = $1, zip_code = $2,
         picture = $3, general_location = $4,
-        date=$5, launched_organically=$6, latitude=$8, longitude=$9, show_on_map=TRUE
+        date=$5, launched_organically=$6, latitude=$8, longitude=$9, show_on_map=TRUE,
+        boxholder_name=$10, boxholder_email=$11
       WHERE
         box_id = $7`,
       [
@@ -139,6 +142,8 @@ const copyTransactionInfoToAnchorBox = async (
         boxID,
         latitude,
         longitude,
+        boxHolderName,
+        boxHolderEmail,
       ],
     );
   } catch (err) {
