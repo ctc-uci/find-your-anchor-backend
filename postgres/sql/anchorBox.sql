@@ -12,5 +12,7 @@ CREATE TABLE IF NOT EXISTS public."Anchor_Box"
   latitude double precision,
   longitude double precision,
   show_on_map boolean,
+  boxholder_name text COLLATE pg_catalog."default",
+  boxholder_email text COLLATE pg_catalog."default",
   CONSTRAINT "Anchor_Box_pkey" PRIMARY KEY (box_id)
 );

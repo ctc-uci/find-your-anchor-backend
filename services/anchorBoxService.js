@@ -4,7 +4,7 @@ const getAnchorBoxesByLocation = async (zipCode, country) => {
   let res = null;
   try {
     res = await db.query(
-      'SELECT * FROM "Anchor_Box" WHERE zip_code = $1 AND country = $2 AND show_on_map = TRUE',
+      'SELECT * FROM "Anchor_Box" WHERE zip_code = $1 AND country = $2 AND show_on_map = TRUE ORDER BY box_id',
       [zipCode, country],
     );
   } catch (err) {
