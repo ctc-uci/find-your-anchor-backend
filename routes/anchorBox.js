@@ -24,6 +24,16 @@ anchorBoxRouter.get('/', async (req, res) => {
   }
 });
 
+anchorBoxRouter.get('/box/:boxId', async (req, res) => {
+  try {
+    const { boxId } = req.params;
+    const anchorBox = await findBoxId(boxId);
+    return res.status(200).send(anchorBox);
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+});
+
 anchorBoxRouter.get('/locations', async (req, res) => {
   try {
     const locationInfo = await getAllLocationInfo();
@@ -33,7 +43,7 @@ anchorBoxRouter.get('/locations', async (req, res) => {
   }
 });
 
-anchorBoxRouter.post('/', async (req, res) => {
+anchorBoxRouter.post('/box', async (req, res) => {
   try {
     const {
       boxNumber,
@@ -55,7 +65,7 @@ anchorBoxRouter.post('/', async (req, res) => {
     }
 
     // 2. create new Anchor_Box if boxNumber does not exist
-    const allBoxes = await createAnchorBox(
+    const newAnchorBox = await createAnchorBox(
       boxNumber,
       message,
       zipCode,
@@ -65,9 +75,37 @@ anchorBoxRouter.post('/', async (req, res) => {
       launchedOrganically,
       additionalComments,
     );
-    res.status(200).send(allBoxes);
+    res.status(200).send(newAnchorBox);
   } catch (error) {
     res.status(500).send(error);
+  }
+});
+
+anchorBoxRouter.post('/boxes', async (req, res) => {
+  try {
+    const formDatas = req.body;
+    formDatas.forEach(async (formData) => {
+      // 1. check if boxNumber already exists
+      const anchorBox = await findBoxId(formData.boxNumber);
+
+      if (anchorBox.length > 0) {
+        res.status(400).json({ message: `box number ${formData.boxNumber} already exists` });
+        return;
+      }
+      // 2. create new Anchor_Box if boxNumber does not exist
+      await createAnchorBox(
+        formData.boxNumber,
+        formData.message,
+        formData.picture,
+        formData.boxLocation,
+        formData.date,
+        formData.launchedOrganically,
+        formData.additionalComments,
+      );
+    });
+    res.status(200).send('upload success');
+  } catch (err) {
+    res.status(500).send(err.message);
   }
 });
 
