@@ -5,7 +5,7 @@ const {
   deleteAnchorBox,
   getAnchorBoxesByLocation,
   updateAnchorBox,
-  getAllAnchorBoxes,
+  getAllAnchorBoxesOnMap,
   getAllLocationInfo,
 } = require('../services/anchorBoxService');
 
@@ -13,14 +13,14 @@ anchorBoxRouter.get('/', async (req, res) => {
   try {
     const { zipCode, country } = req.query;
     if (zipCode === undefined || country === undefined) {
-      const anchorBoxes = await getAllAnchorBoxes();
+      const anchorBoxes = await getAllAnchorBoxesOnMap();
       res.status(200).send(anchorBoxes);
       return;
     }
     const anchorBoxes = await getAnchorBoxesByLocation(zipCode, country);
     res.status(200).send(anchorBoxes);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(500).send(error);
   }
 });
 
@@ -39,7 +39,7 @@ anchorBoxRouter.get('/locations', async (req, res) => {
     const locationInfo = await getAllLocationInfo();
     res.status(200).send(locationInfo);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(500).send(error);
   }
 });
 
@@ -115,7 +115,7 @@ anchorBoxRouter.delete('/:boxId', async (req, res) => {
     const response = await deleteAnchorBox(boxId);
     res.status(200).send(response);
   } catch (error) {
-    res.status(400).send(error);
+    res.status(500).send(error);
   }
 });
 

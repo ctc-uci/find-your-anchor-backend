@@ -86,7 +86,7 @@ const updateAnchorBox = async (boxID, showOnMap) => {
   return res;
 };
 
-const getAllAnchorBoxes = async () => {
+const getAllAnchorBoxesOnMap = async () => {
   let res = null;
   try {
     res = await db.query(
@@ -118,6 +118,6 @@ module.exports = {
   deleteAnchorBox,
   getAnchorBoxesByLocation,
   updateAnchorBox,
-  getAllAnchorBoxes,
+  getAllAnchorBoxesOnMap,
   getAllLocationInfo,
 };
