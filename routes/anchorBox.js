@@ -52,7 +52,7 @@ anchorBoxRouter.post('/box', async (req, res) => {
       boxLocation,
       message,
       picture,
-      additionalComments,
+      comments,
       launchedOrganically,
     } = req.body;
     // Create anchor box
@@ -64,7 +64,7 @@ anchorBoxRouter.post('/box', async (req, res) => {
       boxLocation,
       date,
       launchedOrganically,
-      additionalComments,
+      comments,
     );
     res.status(200).send(newAnchorBox);
   } catch (error) {
