@@ -55,16 +55,7 @@ anchorBoxRouter.post('/box', async (req, res) => {
       additionalComments,
       launchedOrganically,
     } = req.body;
-
-    // 1. check if boxNumber already exists
-    const anchorBox = await findBoxId(boxNumber);
-
-    if (anchorBox.length > 0) {
-      res.status(400).json({ message: `box number ${boxNumber} already exists` });
-      return;
-    }
-
-    // 2. create new Anchor_Box if boxNumber does not exist
+    // Create anchor box
     const newAnchorBox = await createAnchorBox(
       boxNumber,
       message,
@@ -85,14 +76,7 @@ anchorBoxRouter.post('/boxes', async (req, res) => {
   try {
     const formDatas = req.body;
     formDatas.forEach(async (formData) => {
-      // 1. check if boxNumber already exists
-      const anchorBox = await findBoxId(formData.boxNumber);
-
-      if (anchorBox.length > 0) {
-        res.status(400).json({ message: `box number ${formData.boxNumber} already exists` });
-        return;
-      }
-      // 2. create new Anchor_Box if boxNumber does not exist
+      // Create anchor box
       await createAnchorBox(
         formData.boxNumber,
         formData.message,
