@@ -135,10 +135,69 @@ const copyTransactionInfoToAnchorBox = async (
   return res;
 };
 
+const addBox = async (
+  boxID,
+  message,
+  boxholderEmail,
+  boxholderName,
+  generalLocation,
+  picture,
+  status,
+  pickup,
+  changesRequested,
+  rejectionReason,
+  messageStatus,
+  zipcode,
+  date,
+  launchedOrganically,
+  imageStatus,
+) => {
+  let res = null;
+  try {
+    res = await db.query(
+      `INSERT INTO "Box_History" (
+        box_id, message, boxholder_email, boxholder_name,
+        general_location, picture, approved, status,
+        pickup, changes_requested, rejection_reason, message_status,
+        zip_code, date, launched_organically, image_status
+      )
+      VALUES (
+        $(boxID), $(message), $(boxholderEmail), $(boxholderName),
+        $(generalLocation), $(picture), $(approved), $(status),
+        $(pickup), $(changesRequested), $(rejectionReason), $(messageStatus),
+        $(zipcode), $(date), $(launchedOrganically), $(imageStatus)
+      )
+      RETURNING *;`,
+      {
+        boxID,
+        message,
+        boxholderEmail,
+        boxholderName,
+        generalLocation,
+        picture,
+        approved: false,
+        status,
+        pickup,
+        changesRequested,
+        rejectionReason,
+        messageStatus,
+        zipcode,
+        date,
+        launchedOrganically,
+        imageStatus,
+      },
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
 module.exports = {
   getTransactionByID,
   getBoxesWithStatusOrPickup,
   updateBox,
+  addBox,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
 };
