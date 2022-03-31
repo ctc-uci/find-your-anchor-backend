@@ -1,4 +1,4 @@
-const { db } = require('../config');
+const db = require('../config');
 
 const SQLQueries = {
   GetBoxesByFilters: (selectClauseSQL, whereClauseSQL, orderBySQL) =>
@@ -95,7 +95,7 @@ module.exports = {
         SQLQueries.GetBoxesByFilters(selectClauseSQL, whereClauseSQL, orderBySQL),
       );
 
-      return res.rows;
+      return res;
     } catch (err) {
       throw new Error(err.message);
     }
