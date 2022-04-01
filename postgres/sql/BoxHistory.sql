@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS public."Box_History"
 (
+    transaction_id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     box_id integer NOT NULL,
     message character varying COLLATE pg_catalog."default",
     boxholder_email character varying COLLATE pg_catalog."default",
@@ -16,6 +17,6 @@ CREATE TABLE IF NOT EXISTS public."Box_History"
     zip_code character varying COLLATE pg_catalog."default",
     date character varying COLLATE pg_catalog."default",
     launched_organically boolean,
-
-    CONSTRAINT "Box_History_pkey" PRIMARY KEY (box_id)
+    image_status character varying(255) COLLATE pg_catalog."default",
+    CONSTRAINT "Box_History_pkey1" PRIMARY KEY (transaction_id)
 );
