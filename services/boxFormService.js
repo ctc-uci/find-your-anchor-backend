@@ -69,18 +69,18 @@ const createMultipleAnchorBoxes = async (formDatas) => {
         zip_code, picture, general_location,
         date, launched_organically, additional_comments)
         VALUES(
-        ${boxNumber},
-        ${message},
-        ${zipCode},
-        ${picture},
-        ${boxLocation},
-        ${date},
+        ${boxNumber || `''`},
+        ${message || `''`},
+        ${zipCode || `''`},
+        ${picture || `''`},
+        ${boxLocation || `''`},
+        ${date || `''`},
         ${launchedOrganically},
-        ${additionalComments});
+        ${additionalComments || `''`});
       `;
       },
     );
-    // console.log('query: ', multiBoxesQuery)
+    // console.log('query: ', multiBoxesQuery);
     await db.multi(multiBoxesQuery);
   } catch (err) {
     // console.log(err.message);
