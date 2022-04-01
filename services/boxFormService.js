@@ -50,4 +50,42 @@ const createAnchorBox = async ({
   return res;
 };
 
-module.exports = { findBoxId, createAnchorBox };
+const createMultipleAnchorBoxes = async (formDatas) => {
+  try {
+    let multiBoxesQuery = ``;
+    formDatas.forEach(
+      ({
+        boxNumber,
+        message,
+        zipCode,
+        picture,
+        boxLocation,
+        date,
+        launchedOrganically,
+        additionalComments,
+      }) => {
+        multiBoxesQuery += `INSERT INTO "Anchor_Box"
+        (box_id, message,
+        zip_code, picture, general_location,
+        date, launched_organically, additional_comments)
+        VALUES(
+        ${boxNumber},
+        ${message},
+        ${zipCode},
+        ${picture},
+        ${boxLocation},
+        ${date},
+        ${launchedOrganically},
+        ${additionalComments});
+      `;
+      },
+    );
+    // console.log('query: ', multiBoxesQuery)
+    await db.multi(multiBoxesQuery);
+  } catch (err) {
+    // console.log(err.message);
+    throw new Error(err.message);
+  }
+};
+
+module.exports = { findBoxId, createAnchorBox, createMultipleAnchorBoxes };

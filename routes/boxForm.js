@@ -9,12 +9,13 @@ router.get('/:boxId', async (req, res) => {
   }
 });
 
-router.post('/boxes', (req, res) => {
+router.post('/boxes', async (req, res) => {
   try {
     const formDatas = req.body;
-    formDatas.forEach(async (formData) => {
-      await boxFormService.createAnchorBox(formData);
-    });
+    await boxFormService.createMultipleAnchorBoxes(formDatas);
+    // formDatas.forEach(async (formData) => {
+    //   await boxFormService.createAnchorBox(formData);
+    // });
     return res.status(200).send('upload success');
   } catch (err) {
     return res.status(500).send(err.message);
