@@ -80,10 +80,8 @@ const createMultipleAnchorBoxes = async (formDatas) => {
       `;
       },
     );
-    // console.log('query: ', multiBoxesQuery);
     await db.multi(multiBoxesQuery);
   } catch (err) {
-    // console.log(err.message);
     throw new Error(err.message);
   }
 };
