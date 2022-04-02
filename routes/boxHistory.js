@@ -3,11 +3,13 @@ const express = require('express');
 const boxHistoryRouter = express();
 const {
   updateBox,
+  addBox,
   getTransactionByID,
   getBoxesWithStatusOrPickup,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
 } = require('../services/boxHistoryService');
+const { findBoxId } = require('../services/boxFormService');
 
 boxHistoryRouter.use(express.json());
 
@@ -28,6 +30,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       rejectionReason,
       messageStatus,
       launchedOrganically,
+      imageStatus,
     } = req.body;
     const response = await updateBox(
       status,
@@ -43,10 +46,65 @@ boxHistoryRouter.put('/update', async (req, res) => {
       rejectionReason,
       messageStatus,
       launchedOrganically,
+      imageStatus,
     );
     res.status(200).send(response);
   } catch (err) {
     res.status(500).send(err.message);
+  }
+});
+
+// Adds a box to the Box History table
+boxHistoryRouter.post('/', async (req, res) => {
+  try {
+    const {
+      boxID,
+      message,
+      boxholderEmail,
+      boxholderName,
+      generalLocation,
+      picture,
+      status,
+      pickup,
+      changesRequested,
+      rejectionReason,
+      messageStatus,
+      zipcode,
+      date,
+      launchedOrganically,
+      imageStatus,
+    } = req.body;
+    // Check for required parameters
+    const requiredParams = ['boxID', 'boxholderEmail', 'zipcode', 'date'];
+    const missingParams = !requiredParams.every((param) =>
+      Object.prototype.hasOwnProperty.call(req.body, param),
+    );
+    if (missingParams) return res.status(400).send('Missing a required parameter');
+
+    // Check if box exists in anchor box
+    const matchingBox = await findBoxId(boxID);
+    if (matchingBox.length === 0) return res.status(400).send('Could not a find box with that ID');
+
+    const response = await addBox(
+      boxID,
+      message,
+      boxholderEmail,
+      boxholderName,
+      generalLocation,
+      picture,
+      status,
+      pickup,
+      changesRequested,
+      rejectionReason,
+      messageStatus,
+      zipcode,
+      date,
+      launchedOrganically,
+      imageStatus,
+    );
+    return res.status(200).send(response);
+  } catch (err) {
+    return res.status(500).send(err.message);
   }
 });
 

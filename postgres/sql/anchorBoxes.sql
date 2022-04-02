@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS public."Anchor_Box"
 (
     box_id integer NOT NULL,
-    approved boolean,
     message text COLLATE pg_catalog."default",
     zip_code text COLLATE pg_catalog."default",
     picture text COLLATE pg_catalog."default",

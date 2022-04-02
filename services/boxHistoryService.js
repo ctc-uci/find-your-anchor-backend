@@ -1,7 +1,4 @@
-const pgp = require('pg-promise')({});
-
-const cn = `postgresql://${process.env.REACT_APP_DATABASE_USER}:${process.env.REACT_APP_DATABASE_PASSWORD}@${process.env.REACT_APP_DATABASE_HOST}:${process.env.REACT_APP_DATABASE_PORT}/${process.env.REACT_APP_DATABASE_NAME}?ssl=true`; // For pgp
-const db = pgp(cn);
+const db = require('../config');
 
 const getTransactionByID = async (transactionID) => {
   let res = null;
@@ -49,6 +46,7 @@ const updateBox = async (
   rejectionReason,
   messageStatus,
   launchedOrganically,
+  imageStatus,
 ) => {
   let res = null;
   try {
@@ -68,6 +66,7 @@ const updateBox = async (
         ${
           launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
         }
+        ${imageStatus !== undefined ? ', image_status = $(imageStatus)' : ''}
       WHERE
         transaction_id = $(transactionID)
       RETURNING *`,
@@ -85,6 +84,7 @@ const updateBox = async (
         rejectionReason,
         messageStatus,
         launchedOrganically,
+        imageStatus,
       },
     );
   } catch (err) {
@@ -135,10 +135,69 @@ const copyTransactionInfoToAnchorBox = async (
   return res;
 };
 
+const addBox = async (
+  boxID,
+  message,
+  boxholderEmail,
+  boxholderName,
+  generalLocation,
+  picture,
+  status,
+  pickup,
+  changesRequested,
+  rejectionReason,
+  messageStatus,
+  zipcode,
+  date,
+  launchedOrganically,
+  imageStatus,
+) => {
+  let res = null;
+  try {
+    res = await db.query(
+      `INSERT INTO "Box_History" (
+        box_id, message, boxholder_email, boxholder_name,
+        general_location, picture, approved, status,
+        pickup, changes_requested, rejection_reason, message_status,
+        zip_code, date, launched_organically, image_status
+      )
+      VALUES (
+        $(boxID), $(message), $(boxholderEmail), $(boxholderName),
+        $(generalLocation), $(picture), $(approved), $(status),
+        $(pickup), $(changesRequested), $(rejectionReason), $(messageStatus),
+        $(zipcode), $(date), $(launchedOrganically), $(imageStatus)
+      )
+      RETURNING *;`,
+      {
+        boxID,
+        message,
+        boxholderEmail,
+        boxholderName,
+        generalLocation,
+        picture,
+        approved: false,
+        status,
+        pickup,
+        changesRequested,
+        rejectionReason,
+        messageStatus,
+        zipcode,
+        date,
+        launchedOrganically,
+        imageStatus,
+      },
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
 module.exports = {
   getTransactionByID,
   getBoxesWithStatusOrPickup,
   updateBox,
+  addBox,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
 };

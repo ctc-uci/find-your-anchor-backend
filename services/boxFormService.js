@@ -1,7 +1,4 @@
-const pgp = require('pg-promise')({});
-
-const cn = `postgresql://${process.env.REACT_APP_DATABASE_USER}:${process.env.REACT_APP_DATABASE_PASSWORD}@${process.env.REACT_APP_DATABASE_HOST}:${process.env.REACT_APP_DATABASE_PORT}/${process.env.REACT_APP_DATABASE_NAME}?ssl=true`; // For pgp
-const db = pgp(cn);
+const db = require('../config');
 
 const findBoxId = async (id) => {
   let res = null;
@@ -17,7 +14,7 @@ const findBoxId = async (id) => {
   return res;
 };
 
-const createAnchorBox = async (
+const createAnchorBox = async ({
   boxNumber,
   message,
   zipCode,
@@ -26,7 +23,7 @@ const createAnchorBox = async (
   date,
   launchedOrganically,
   additionalComments,
-) => {
+}) => {
   let res = null;
   try {
     res = await db.query(
