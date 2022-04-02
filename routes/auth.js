@@ -22,7 +22,7 @@ const verifyToken = async (req, res, next) => {
     }
     return next();
   } catch (err) {
-    return res.status(400).send('@verifyToken no access token');
+    return res.status(500).send('@verifyToken no access token');
   }
 };
 
@@ -34,7 +34,7 @@ authRouter.get('/verifyToken/:accessToken', async (req, res) => {
     const decodedToken = await admin.auth().verifyIdToken(accessToken);
     return res.status(200).send(decodedToken.uid);
   } catch (err) {
-    return res.status(400).send('@verifyToken no access token');
+    return res.status(500).send('@verifyToken no access token');
   }
 });
 
