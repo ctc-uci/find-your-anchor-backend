@@ -17,7 +17,7 @@ adminInviteRouter.post('/', async (req, res) => {
       admin: admin.rows[0],
     });
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(500).send(err.message);
   }
 });
 
@@ -30,7 +30,7 @@ adminInviteRouter.get('/:inviteId', async (req, res) => {
       admin: admin[0],
     });
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(500).send(err.message);
   }
 });
 
@@ -41,7 +41,7 @@ adminInviteRouter.delete('/:email', async (req, res) => {
     await deleteAdminInvite(email);
     res.status(200).send(`Deleted user with email ${email}`);
   } catch (err) {
-    res.status(400).send(err.message);
+    res.status(500).send(err.message);
   }
 });
 
