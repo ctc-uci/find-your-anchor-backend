@@ -4,7 +4,6 @@ const express = require('express');
 const userRouter = express();
 const admin = require('../firebase');
 const {
-  getAllUsers,
   getUserByUserId,
   getUserByEmail,
   deleteUser,
@@ -19,18 +18,6 @@ const isAlphaNumeric = (value) => {
     throw new Error('User ID must be alphanumeric');
   }
 };
-
-// Get all users
-userRouter.get('/', async (req, res) => {
-  try {
-    const user = await getAllUsers();
-    res.send({
-      account: user.rows,
-    });
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
 
 // Get a specific user by ID
 userRouter.get('/userId/:userId', async (req, res) => {
@@ -91,21 +78,21 @@ userRouter.post('/create', async (req, res) => {
     const newUser = await createUser(firstName, lastName, email, user.uid);
 
     res.status(200).send({
-      newUser: newUser.rows[0],
+      newUser: newUser[0],
     });
   } catch (err) {
     res.status(500).send(err.message);
   }
 });
 
-// Add user to database
+// Edit user in database
 userRouter.put('/:userId', async (req, res) => {
   try {
     const { firstName, lastName, userId } = req.body;
     isAlphaNumeric(userId); // ID must be alphanumeric
     const newUser = await updateUser(firstName, lastName, userId);
     res.status(200).send({
-      newUser: newUser.rows[0],
+      newUser: newUser[0],
     });
   } catch (err) {
     res.status(500).send(err.message);

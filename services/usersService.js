@@ -44,7 +44,7 @@ const createUser = async (firstName, lastName, email, userId) => {
   let res = null;
   try {
     res = await db.query(
-      `INSERT INTO "Users" (first_name, last_name, email, user_id) VALUES ($1, $2, $3, $4)`,
+      `INSERT INTO "Users" (first_name, last_name, email, user_id) VALUES ($1, $2, $3, $4) RETURNING *`,
       [firstName, lastName, email, userId],
     );
   } catch (err) {
@@ -56,11 +56,10 @@ const createUser = async (firstName, lastName, email, userId) => {
 const updateUser = async (firstName, lastName, userId) => {
   let res = null;
   try {
-    res = await db.query(`UPDATE "Users" SET first_name = $1, last_name = $2 WHERE user_id = $3`, [
-      firstName,
-      lastName,
-      userId,
-    ]);
+    res = await db.query(
+      `UPDATE "Users" SET first_name = $1, last_name = $2 WHERE user_id = $3 RETURNING *`,
+      [firstName, lastName, userId],
+    );
   } catch (err) {
     throw new Error(err.message);
   }

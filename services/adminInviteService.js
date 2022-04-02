@@ -4,7 +4,7 @@ const addAdminInvite = async (email, inviteId) => {
   let res = null;
   try {
     res = await db.query(
-      'INSERT INTO "Admin_Invite" (email, invite_id, expire_time, valid_invite) VALUES ($1, $2, NOW() + INTERVAL \'7 days\', $3)',
+      'INSERT INTO "Admin_Invite" (email, invite_id, expire_time, valid_invite) VALUES ($1, $2, NOW() + INTERVAL \'7 days\', $3) RETURNING *',
       [email, inviteId, true],
     );
   } catch (err) {

@@ -14,7 +14,7 @@ adminInviteRouter.post('/', async (req, res) => {
   try {
     const admin = await addAdminInvite(email, inviteId);
     res.status(200).send({
-      admin: admin.rows[0],
+      admin: admin[0],
     });
   } catch (err) {
     res.status(500).send(err.message);
