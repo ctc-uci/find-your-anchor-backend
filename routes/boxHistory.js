@@ -8,8 +8,9 @@ const {
   getBoxesWithStatusOrPickup,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
+  getHistoryOfBox,
 } = require('../services/boxHistoryService');
-const { findBoxId } = require('../services/boxFormService');
+const { findBoxId } = require('../services/anchorBoxService');
 
 boxHistoryRouter.use(express.json());
 
@@ -122,7 +123,7 @@ boxHistoryRouter.get('/', async (req, res) => {
 });
 
 // get a box
-boxHistoryRouter.get('/:transactionID', async (req, res) => {
+boxHistoryRouter.get('/transaction/:transactionID', async (req, res) => {
   const { transactionID } = req.params;
   try {
     const box = await getTransactionByID(transactionID);
@@ -136,19 +137,34 @@ boxHistoryRouter.get('/:transactionID', async (req, res) => {
   }
 });
 
+// Gets a box's history
+boxHistoryRouter.get('/history/:boxID', async (req, res) => {
+  const { boxID } = req.params;
+  try {
+    const history = await getHistoryOfBox(boxID);
+    res.status(200).send(history);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 // Approves a row in box history and then copies the relevant box information into Anchor Box
 boxHistoryRouter.put('/approveBox', async (req, res) => {
   try {
-    const { transactionID } = req.body;
+    const { transactionID, latitude, longitude } = req.body;
     const approvedBox = await approveTransactionInBoxHistory(transactionID);
     await copyTransactionInfoToAnchorBox(
-      approvedBox.rows[0].message,
-      approvedBox.rows[0].zip_code,
-      approvedBox.rows[0].picture,
-      approvedBox.rows[0].general_location,
-      approvedBox.rows[0].date,
-      approvedBox.rows[0].launched_organically,
-      approvedBox.rows[0].transactionID,
+      approvedBox[0].message,
+      approvedBox[0].zip_code,
+      approvedBox[0].picture,
+      approvedBox[0].general_location,
+      approvedBox[0].date,
+      approvedBox[0].launched_organically,
+      approvedBox[0].box_id,
+      latitude,
+      longitude,
+      approvedBox[0].boxholder_name,
+      approvedBox[0].boxholder_email,
     );
     res.status(200).send('Successfully approved box');
   } catch (err) {
