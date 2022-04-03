@@ -73,7 +73,8 @@ const getBoxesByFilters = async (req) => {
       whereClauseConditions.push(zipcodeToSQL(zipCode));
     }
     if (dateOption === 'date-single') {
-      whereClauseConditions.push(`date = ${singleDate}`);
+      console.log('SINGLE DATE:', singleDate);
+      whereClauseConditions.push(`date = '${singleDate}'`);
     } else if (dateOption === 'date-range') {
       whereClauseConditions.push(
         `TO_DATE(date, 'MM/DD/YYYY') BETWEEN (DATE '${startDate}') AND (DATE '${endDate}')`,
