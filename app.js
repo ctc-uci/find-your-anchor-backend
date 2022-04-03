@@ -7,7 +7,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const boxHistoryRouter = require('./routes/boxHistory');
 const exportCSVRouter = require('./routes/exportCSV');
-const boxFormRouter = require('./routes/boxForm');
+const anchorBoxRouter = require('./routes/anchorBox');
 const s3UploadRouter = require('./routes/s3upload');
 const emailRouter = require('./routes/nodeMailer');
 
@@ -27,8 +27,8 @@ app.use(
 );
 
 app.use('/boxHistory', boxHistoryRouter);
-app.use('/boxForm', boxFormRouter);
 app.use('/exportCSV', exportCSVRouter);
+app.use('/anchorBox', anchorBoxRouter);
 app.use('/s3Upload', s3UploadRouter);
 app.use('/nodemailer', emailRouter);
 

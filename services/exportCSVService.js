@@ -1,10 +1,5 @@
 const db = require('../config');
 
-const SQLQueries = {
-  GetBoxesByFilters: (selectClauseSQL, whereClauseSQL, orderBySQL) =>
-    `SELECT ${selectClauseSQL} FROM "Anchor_Box" WHERE ${whereClauseSQL} ORDER BY ${orderBySQL}`,
-};
-
 // the following are helper functions
 const sortbyToSQL = (sortBy) => {
   switch (sortBy) {
@@ -54,50 +49,52 @@ const boxDetailsToSQL = (boxDetails) => {
     : 'date, box_id, zip_code, picture, general_location, launched_organically, message';
 };
 
-module.exports = {
-  getBoxesByFilters: async (req) => {
-    const {
-      sortBy,
-      boxOption,
-      boxRange,
-      dateOption,
-      singleDate,
-      startDate,
-      endDate,
-      zipOption,
-      zipCode,
-      launchOrg,
-      boxDetails,
-    } = req;
+const getBoxesByFilters = async (req) => {
+  const {
+    sortBy,
+    boxOption,
+    boxRange,
+    dateOption,
+    singleDate,
+    startDate,
+    endDate,
+    zipOption,
+    zipCode,
+    launchedOrganically,
+    boxDetails,
+  } = req;
 
-    try {
-      const whereClauseConditions = [];
-      if (boxOption === 'boxes-custom') {
-        whereClauseConditions.push(boxesToSQL(boxRange));
-      }
-      if (zipOption === 'zip-code-custom') {
-        whereClauseConditions.push(zipcodeToSQL(zipCode));
-      }
-      if (dateOption === 'date-single') {
-        whereClauseConditions.push(`date = ${singleDate}`);
-      } else if (dateOption === 'date-range') {
-        whereClauseConditions.push(
-          `TO_DATE(date, 'MM/DD/YYYY') BETWEEN (DATE '${startDate}') AND (DATE '${endDate}')`,
-        );
-      }
-      whereClauseConditions.push(`launched_organically = ${launchOrg === 'yes'}`);
-
-      const whereClauseSQL = whereClauseConditions.join(' AND '); // combine all the conditions in the where clause
-      const orderBySQL = sortbyToSQL(sortBy);
-      const selectClauseSQL = boxDetailsToSQL(boxDetails);
-
-      const res = await db.query(
-        SQLQueries.GetBoxesByFilters(selectClauseSQL, whereClauseSQL, orderBySQL),
-      );
-
-      return res;
-    } catch (err) {
-      throw new Error(err.message);
+  try {
+    const whereClauseConditions = [];
+    if (boxOption === 'boxes-custom') {
+      whereClauseConditions.push(boxesToSQL(boxRange));
     }
-  },
+    if (zipOption === 'zip-code-custom') {
+      whereClauseConditions.push(zipcodeToSQL(zipCode));
+    }
+    if (dateOption === 'date-single') {
+      whereClauseConditions.push(`date = ${singleDate}`);
+    } else if (dateOption === 'date-range') {
+      whereClauseConditions.push(
+        `TO_DATE(date, 'MM/DD/YYYY') BETWEEN (DATE '${startDate}') AND (DATE '${endDate}')`,
+      );
+    }
+    whereClauseConditions.push(`launched_organically = ${launchedOrganically === 'yes'}`);
+
+    const whereClauseSQL = whereClauseConditions.join(' AND '); // combine all the conditions in the where clause
+    const orderBySQL = sortbyToSQL(sortBy);
+    const selectClauseSQL = boxDetailsToSQL(boxDetails);
+
+    const res = await db.query(
+      `SELECT ${selectClauseSQL} FROM "Anchor_Box" WHERE ${whereClauseSQL} ORDER BY ${orderBySQL}`,
+    );
+
+    return res;
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
+module.exports = {
+  getBoxesByFilters,
 };

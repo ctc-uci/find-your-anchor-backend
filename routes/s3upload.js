@@ -5,7 +5,7 @@ const crypto = require('crypto');
 // initialize a S3 instance
 const s3 = new aws.S3({
   region: process.env.AWS_REGION,
-  accessKeyId: process.env.AWS_ACESS_KEY_ID,
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   signatureVersion: 'v4',
 });

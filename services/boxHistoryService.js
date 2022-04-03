@@ -116,7 +116,11 @@ const copyTransactionInfoToAnchorBox = async (
   generalLocation,
   date,
   launchedOrganically,
-  transactionID,
+  boxID,
+  latitude,
+  longitude,
+  boxHolderName,
+  boxHolderEmail,
 ) => {
   let res = null;
   try {
@@ -124,10 +128,94 @@ const copyTransactionInfoToAnchorBox = async (
       `UPDATE "Anchor_Box"
       SET message = $1, zip_code = $2,
         picture = $3, general_location = $4,
-        date=$5, launched_organically=$6
+        date=$5, launched_organically=$6, latitude=$8, longitude=$9, show_on_map=TRUE,
+        boxholder_name=$10, boxholder_email=$11
       WHERE
-        transaction_id = $7`,
-      [message, zipCode, picture, generalLocation, date, launchedOrganically, transactionID],
+        box_id = $7`,
+      [
+        message,
+        zipCode,
+        picture,
+        generalLocation,
+        date,
+        launchedOrganically,
+        boxID,
+        latitude,
+        longitude,
+        boxHolderName,
+        boxHolderEmail,
+      ],
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
+const getHistoryOfBox = async (boxID) => {
+  let res = null;
+  try {
+    res = await db.query(
+      'SELECT * FROM "Box_History" WHERE status = \'evaluated\' AND approved = TRUE AND box_id = $1 AND pickup = FALSE ORDER BY date DESC',
+      [boxID],
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
+const addBox = async (
+  boxID,
+  message,
+  boxholderEmail,
+  boxholderName,
+  generalLocation,
+  picture,
+  status,
+  pickup,
+  changesRequested,
+  rejectionReason,
+  messageStatus,
+  zipcode,
+  date,
+  launchedOrganically,
+  imageStatus,
+) => {
+  let res = null;
+  try {
+    res = await db.query(
+      `INSERT INTO "Box_History" (
+        box_id, message, boxholder_email, boxholder_name,
+        general_location, picture, approved, status,
+        pickup, changes_requested, rejection_reason, message_status,
+        zip_code, date, launched_organically, image_status
+      )
+      VALUES (
+        $(boxID), $(message), $(boxholderEmail), $(boxholderName),
+        $(generalLocation), $(picture), $(approved), $(status),
+        $(pickup), $(changesRequested), $(rejectionReason), $(messageStatus),
+        $(zipcode), $(date), $(launchedOrganically), $(imageStatus)
+      )
+      RETURNING *;`,
+      {
+        boxID,
+        message,
+        boxholderEmail,
+        boxholderName,
+        generalLocation,
+        picture,
+        approved: false,
+        status,
+        pickup,
+        changesRequested,
+        rejectionReason,
+        messageStatus,
+        zipcode,
+        date,
+        launchedOrganically,
+        imageStatus,
+      },
     );
   } catch (err) {
     throw new Error(err.message);
@@ -137,8 +225,10 @@ const copyTransactionInfoToAnchorBox = async (
 
 module.exports = {
   getTransactionByID,
+  getHistoryOfBox,
   getBoxesWithStatusOrPickup,
   updateBox,
+  addBox,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
 };
