@@ -85,10 +85,10 @@ const createAnchorBoxes = async (formDatas) => {
         VALUES(
         ${boxNumber || `''`},
         ${message || `''`},
-        ${zipCode || `''`},
+        ${`'${zipCode}'`},
         ${picture || `''`},
         ${boxLocation || `''`},
-        ${date || `''`},
+        ${`'${date}'`},
         ${launchedOrganically},
         ${additionalComments || `''`});
       `;
