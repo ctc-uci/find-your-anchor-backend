@@ -86,8 +86,6 @@ const getBoxesByFilters = async (req) => {
     const orderBySQL = sortbyToSQL(sortBy);
     const selectClauseSQL = boxDetailsToSQL(boxDetails);
 
-    // console.log(`SELECT ${selectClauseSQL} FROM "Anchor_Box" WHERE ${whereClauseSQL} ORDER BY ${orderBySQL}`);
-
     const res = await db.query(
       `SELECT ${selectClauseSQL} FROM "Anchor_Box" WHERE ${whereClauseSQL} ORDER BY ${orderBySQL}`,
     );
