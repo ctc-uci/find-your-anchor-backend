@@ -8,7 +8,7 @@ const sortbyToSQL = (sortBy) => {
     case 'descend-box-num':
       return 'box_id DESC';
     case 'chronologic':
-      return 'date ASC';
+      return `TO_DATE(date, 'MM/DD/YYYY') ASC`;
     case 'ascend-zip-code':
       return 'zip_code ASC';
     case 'descend-zip-code':
