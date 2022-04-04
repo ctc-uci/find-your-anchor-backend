@@ -9,6 +9,7 @@ const {
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
   getHistoryOfBox,
+  deleteBox,
 } = require('../services/boxHistoryService');
 const { findBoxId } = require('../services/anchorBoxService');
 
@@ -167,6 +168,16 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
       approvedBox[0].boxholder_email,
     );
     res.status(200).send('Successfully approved box');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+boxHistoryRouter.delete('/:boxID', async (req, res) => {
+  try {
+    const { boxID } = req.params;
+    await deleteBox(boxID);
+    res.status(200).send(`Successfully deleted box ${boxID}`);
   } catch (err) {
     res.status(500).send(err.message);
   }
