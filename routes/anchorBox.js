@@ -7,6 +7,7 @@ const {
   updateAnchorBox,
   getAllAnchorBoxesOnMap,
   getAllLocationInfo,
+  getBoxesForSearch,
 } = require('../services/anchorBoxService');
 
 anchorBoxRouter.get('/', async (req, res) => {
@@ -38,6 +39,20 @@ anchorBoxRouter.get('/locations', async (req, res) => {
   try {
     const locationInfo = await getAllLocationInfo();
     res.status(200).send(locationInfo);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+anchorBoxRouter.get('/search/', async (req, res) => {
+  try {
+    // const { boxID } = req.params;
+    // const boxes = await getBoxesForSearch(boxID);
+    // res.status(200).send(boxes);
+    const box = await getBoxesForSearch(1);
+    box[0].boundingbox = ['32.5295236', '42.009499', '-124.482003', '-114.1307816'];
+    box[0].display_name = '1';
+    res.send(box);
   } catch (error) {
     res.status(500).send(error);
   }

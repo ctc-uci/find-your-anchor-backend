@@ -112,6 +112,19 @@ const getAllLocationInfo = async () => {
   return res;
 };
 
+const getBoxesForSearch = async (query) => {
+  let res = null;
+  try {
+    res = await db.query(
+      `SELECT latitude as lat, longitude as lon, box_id as display_name FROM "Anchor_Box" WHERE box_id = $1`,
+      [query],
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
 module.exports = {
   findBoxId,
   createAnchorBox,
@@ -120,4 +133,5 @@ module.exports = {
   updateAnchorBox,
   getAllAnchorBoxesOnMap,
   getAllLocationInfo,
+  getBoxesForSearch,
 };
