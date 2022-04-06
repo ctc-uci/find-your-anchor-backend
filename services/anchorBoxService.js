@@ -116,7 +116,8 @@ const getBoxesForSearch = async (query) => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT latitude as lat, longitude as lon, box_id as display_name FROM "Anchor_Box2" WHERE box_id = $1`,
+      `SELECT latitude as lat, longitude as lon, box_id as display_name FROM "Anchor_Box2" WHERE box_id LIKE '%' || $1 || '%'
+      AND latitude IS NOT NULL AND longitude IS NOT NULL`,
       [query],
     );
   } catch (err) {

@@ -46,13 +46,17 @@ anchorBoxRouter.get('/locations', async (req, res) => {
 
 anchorBoxRouter.get('/search/', async (req, res) => {
   try {
-    // const { boxID } = req.params;
-    // const boxes = await getBoxesForSearch(boxID);
-    // res.status(200).send(boxes);
-    const box = await getBoxesForSearch(1);
-    box[0].boundingbox = ['32.5295236', '42.009499', '-124.482003', '-114.1307816'];
-    box[0].display_name = '1';
-    res.send(box);
+    const { q } = req.query;
+    const results = await getBoxesForSearch(q.toString());
+    for (let i = 0; i < results.length; i += 1) {
+      results[i].boundingbox = [
+        (results[i].lat - 2).toString(),
+        (results[i].lat + 2).toString(),
+        (results[i].lon - 2).toString(),
+        (results[i].lon + 2).toString(),
+      ];
+    }
+    res.send(results);
   } catch (error) {
     res.status(500).send(error);
   }
