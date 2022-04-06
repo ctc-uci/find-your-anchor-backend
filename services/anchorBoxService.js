@@ -104,12 +104,22 @@ const getAllLocationInfo = async () => {
   try {
     res = await db.query(
       `SELECT DISTINCT zip_code, country, latitude, longitude, COUNT (box_id) AS box_count FROM "Anchor_Box"
-      WHERE show_on_map=TRUE AND latitude IS NOT NULL AND longitude IS NOT NULL GROUP BY zip_code, country, latitude, longitude`,
+      WHERE show_on_map=TRUE AND country IS NOT NULL AND latitude IS NOT NULL AND longitude IS NOT NULL GROUP BY zip_code, country, latitude, longitude`,
     );
   } catch (err) {
     throw new Error(err.message);
   }
-  return res;
+
+  const locationsByCountry = {};
+  res.forEach((location) => {
+    if (location.country in locationsByCountry) {
+      locationsByCountry[location.country].push(location);
+    } else {
+      locationsByCountry[location.country] = [location];
+    }
+  });
+
+  return locationsByCountry;
 };
 
 module.exports = {
