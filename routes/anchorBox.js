@@ -73,7 +73,6 @@ anchorBoxRouter.post('/box', async (req, res) => {
   }
 });
 
-// TODO: Convert this route to use pg-promise's multi-query string feature: http://vitaly-t.github.io/pg-promise/Database.html#multi
 anchorBoxRouter.post('/boxes', async (req, res) => {
   try {
     const response = await createAnchorBoxes(req.body);
