@@ -36,6 +36,9 @@ const createAnchorBox = async (
   date,
   launchedOrganically,
   additionalComments,
+  country,
+  latitude,
+  longitude,
 ) => {
   let res = null;
   try {
@@ -43,8 +46,8 @@ const createAnchorBox = async (
       `INSERT INTO "Anchor_Box"
         (box_id, message,
         zip_code, picture, general_location,
-        date, launched_organically, additional_comments)
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+        date, launched_organically, additional_comments, country, latitude, longitude)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *;`,
       [
         boxNumber,
@@ -55,9 +58,13 @@ const createAnchorBox = async (
         date,
         launchedOrganically,
         additionalComments,
+        country,
+        latitude,
+        longitude,
       ],
     );
   } catch (err) {
+    console.log(err.message);
     throw new Error(err.message);
   }
   return res;
@@ -74,6 +81,7 @@ const createAnchorBoxes = async (formDatas) => {
         zipCode,
         picture,
         boxLocation,
+        country,
         date,
         launchedOrganically,
         additionalComments,
@@ -81,7 +89,7 @@ const createAnchorBoxes = async (formDatas) => {
         multiBoxesQuery += `INSERT INTO "Anchor_Box"
         (box_id, message,
         zip_code, picture, general_location,
-        date, launched_organically, additional_comments)
+        date, launched_organically, additional_comments, country, latitude, longitude)
         VALUES(
         ${boxNumber || `''`},
         ${message || `''`},
@@ -90,7 +98,8 @@ const createAnchorBoxes = async (formDatas) => {
         ${boxLocation || `''`},
         ${`'${date}'`},
         ${launchedOrganically},
-        ${additionalComments || `''`});
+        ${additionalComments || `''`},
+        ${country || `''`});
       `;
       },
     );
