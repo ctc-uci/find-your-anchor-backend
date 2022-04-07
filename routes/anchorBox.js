@@ -44,10 +44,25 @@ anchorBoxRouter.get('/locations', async (req, res) => {
   }
 });
 
+/**
+ * This route 'extends' the nominatim API and is used as a provider for box searching
+ * Provided queries:
+ *  - q: search query (box ID)
+ *  - format: json
+ * REQUIRED output attributes (names MUST be as follows):
+ *  - lat: latitude
+ *  - lon: longitude
+ *  - boundingbox: The rectangular section of the map to zoom to (not used in our case)
+ *  - display_name: The label of the box to display in the search dropdown (MUST be equal to box_id, so no extra text)
+ * ADDITIONAL output attributes:
+ *  - zip_code: The box's zip code
+ *  - country: The box's country
+ */
 anchorBoxRouter.get('/search/', async (req, res) => {
   try {
     const { q } = req.query;
     const results = await getBoxesForSearch(q.toString());
+    // Put dummy boundingbox attribute (MUST be array of length 4 with stringified numbers)
     for (let i = 0; i < results.length; i += 1) {
       results[i].boundingbox = [
         results[i].lat.toString(),
