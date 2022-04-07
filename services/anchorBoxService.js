@@ -27,7 +27,7 @@ const findBoxId = async (id) => {
   return res;
 };
 
-const createAnchorBox = async (
+const createAnchorBox = async ({
   boxNumber,
   message,
   zipCode,
@@ -36,7 +36,7 @@ const createAnchorBox = async (
   date,
   launchedOrganically,
   additionalComments,
-) => {
+}) => {
   let res = null;
   try {
     res = await db.query(
