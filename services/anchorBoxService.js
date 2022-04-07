@@ -122,13 +122,15 @@ const getAllLocationInfo = async () => {
   // locationsByCountry returns a dictionary where each key
   // is a country and the value is the list of locations in that country
   // {
-  //   country: [{
-  //     zip_code,
-  //     country,
-  //     latitude,
-  //     longitude,
-  //     box_count
-  //   }]
+  //   country: [
+  //     {
+  //       zip_code,
+  //       country,
+  //       latitude,
+  //       longitude,
+  //       box_count
+  //     }
+  //   ]
   // }
 
   return locationsByCountry;
