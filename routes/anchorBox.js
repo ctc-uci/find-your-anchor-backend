@@ -50,10 +50,10 @@ anchorBoxRouter.get('/search/', async (req, res) => {
     const results = await getBoxesForSearch(q.toString());
     for (let i = 0; i < results.length; i += 1) {
       results[i].boundingbox = [
-        (results[i].lat - 2).toString(),
-        (results[i].lat + 2).toString(),
-        (results[i].lon - 2).toString(),
-        (results[i].lon + 2).toString(),
+        results[i].lat.toString(),
+        results[i].lat.toString(),
+        results[i].lon.toString(),
+        results[i].lon.toString(),
       ];
     }
     res.send(results);
