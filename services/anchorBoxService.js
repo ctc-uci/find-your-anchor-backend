@@ -19,7 +19,7 @@ const findBoxId = async (id) => {
     res = await db.query(
       `SELECT box_id FROM "Anchor_Box"
       WHERE box_id = $1`,
-      [id],
+      [id.toString()],
     );
   } catch (err) {
     throw new Error(err.message);
@@ -27,7 +27,7 @@ const findBoxId = async (id) => {
   return res;
 };
 
-const createAnchorBox = async ({
+const createAnchorBox = async (
   boxNumber,
   message,
   zipCode,
@@ -36,7 +36,7 @@ const createAnchorBox = async ({
   date,
   launchedOrganically,
   additionalComments,
-}) => {
+) => {
   let res = null;
   try {
     res = await db.query(
