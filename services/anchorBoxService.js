@@ -4,7 +4,7 @@ const getAnchorBoxesByLocation = async (zipCode, country) => {
   let res = null;
   try {
     res = await db.query(
-      'SELECT * FROM "Anchor_Box2" WHERE zip_code = $1 AND country = $2 AND show_on_map = TRUE ORDER BY box_id',
+      'SELECT * FROM "Anchor_Box" WHERE zip_code = $1 AND country = $2 AND show_on_map = TRUE ORDER BY box_id',
       [zipCode, country],
     );
   } catch (err) {
@@ -17,7 +17,7 @@ const findBoxId = async (id) => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT * FROM "Anchor_Box2"
+      `SELECT * FROM "Anchor_Box"
       WHERE box_id = $1`,
       [id],
     );
@@ -40,7 +40,7 @@ const createAnchorBox = async (
   let res = null;
   try {
     res = await db.query(
-      `INSERT INTO "Anchor_Box2"
+      `INSERT INTO "Anchor_Box"
         (box_id, message,
         zip_code, picture, general_location,
         date, launched_organically, additional_comments)
@@ -66,7 +66,7 @@ const createAnchorBox = async (
 const deleteAnchorBox = async (boxID) => {
   let res = null;
   try {
-    res = await db.query('DELETE FROM "Anchor_Box2" WHERE box_id = $1 RETURNING *;', [boxID]);
+    res = await db.query('DELETE FROM "Anchor_Box" WHERE box_id = $1 RETURNING *;', [boxID]);
   } catch (err) {
     throw new Error(err.message);
   }
@@ -77,7 +77,7 @@ const updateAnchorBox = async (boxID, showOnMap) => {
   let res = null;
   try {
     res = await db.query(
-      'UPDATE "Anchor_Box2" SET show_on_map = $2 WHERE box_id = $1 RETURNING *;',
+      'UPDATE "Anchor_Box" SET show_on_map = $2 WHERE box_id = $1 RETURNING *;',
       [boxID, showOnMap],
     );
   } catch (err) {
@@ -90,8 +90,8 @@ const getAllAnchorBoxesOnMap = async () => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT * FROM "Anchor_Box2"
-      WHERE show_on_map=TRUE`,
+      `SELECT * FROM "Anchor_Box"
+      WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND zip_code IS NOT NULL AND country IS NOT NULL AND show_on_map=TRUE`,
     );
   } catch (err) {
     throw new Error(err.message);
@@ -103,8 +103,9 @@ const getAllLocationInfo = async () => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT DISTINCT zip_code, country, latitude, longitude, COUNT (box_id) AS box_count FROM "Anchor_Box2"
-      WHERE show_on_map=TRUE AND latitude IS NOT NULL AND longitude IS NOT NULL GROUP BY zip_code, country, latitude, longitude`,
+      `SELECT DISTINCT zip_code, country, latitude, longitude, COUNT (box_id) AS box_count FROM "Anchor_Box"
+      WHERE show_on_map=TRUE AND latitude IS NOT NULL AND longitude IS NOT NULL AND country IS NOT NULL AND zip_code IS NOT NULL
+      GROUP BY zip_code, country, latitude, longitude`,
     );
   } catch (err) {
     throw new Error(err.message);
@@ -116,7 +117,7 @@ const getBoxesForSearch = async (query) => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT latitude as lat, longitude as lon, box_id as display_name, zip_code, country FROM "Anchor_Box2" WHERE box_id LIKE '%' || $1 || '%'
+      `SELECT latitude as lat, longitude as lon, box_id as display_name, zip_code, country FROM "Anchor_Box" WHERE box_id LIKE '%' || $1 || '%'
       AND latitude IS NOT NULL AND longitude IS NOT NULL`,
       [query],
     );

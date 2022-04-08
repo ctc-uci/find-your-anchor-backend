@@ -4,7 +4,7 @@ const getTransactionByID = async (transactionID) => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT * FROM "Box_History2"
+      `SELECT * FROM "Box_History"
       WHERE transaction_id = $1`,
       [transactionID],
     );
@@ -18,7 +18,7 @@ const getBoxesWithStatusOrPickup = async (status, pickup) => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT * FROM "Box_History2"
+      `SELECT * FROM "Box_History"
       WHERE
         ($(status) = '' OR status = $(status))
         ${pickup ? 'AND pickup = $(pickup)' : ''}
@@ -51,7 +51,7 @@ const updateBox = async (
   let res = null;
   try {
     res = await db.query(
-      `UPDATE "Box_History2" SET
+      `UPDATE "Box_History" SET
         box_id = $(boxID)
         ${status !== undefined ? ', status = $(status)' : ''}
         ${approved !== undefined ? ', approved = $(approved)' : ''}
@@ -97,7 +97,7 @@ const approveTransactionInBoxHistory = async (id) => {
   let res = null;
   try {
     res = await db.query(
-      `UPDATE "Box_History2"
+      `UPDATE "Box_History"
       SET approved = TRUE, status = 'evaluated'
       WHERE transaction_id = $1
       RETURNING *;`,
@@ -156,7 +156,7 @@ const getHistoryOfBox = async (boxID) => {
   let res = null;
   try {
     res = await db.query(
-      'SELECT * FROM "Box_History2" WHERE status = \'evaluated\' AND approved = TRUE AND box_id = $1 AND pickup = FALSE ORDER BY date DESC',
+      'SELECT * FROM "Box_History" WHERE status = \'evaluated\' AND approved = TRUE AND box_id = $1 AND pickup = FALSE ORDER BY date DESC',
       [boxID],
     );
   } catch (err) {
@@ -185,7 +185,7 @@ const addBox = async (
   let res = null;
   try {
     res = await db.query(
-      `INSERT INTO "Box_History2" (
+      `INSERT INTO "Box_History" (
         box_id, message, boxholder_email, boxholder_name,
         general_location, picture, approved, status,
         pickup, changes_requested, rejection_reason, message_status,
