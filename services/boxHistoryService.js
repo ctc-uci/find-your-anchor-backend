@@ -17,15 +17,33 @@ const getTransactionByID = async (transactionID) => {
 const getBoxesWithStatusOrPickup = async (status, pickup) => {
   let res = null;
   try {
-    res = await db.query(
-      `SELECT * FROM "Box_History"
-      WHERE
-        ($(status) = '' OR status = $(status))
-        ${pickup ? 'AND pickup = $(pickup)' : ''}
-      ORDER BY
-        pickup, box_id;`,
-      { status, pickup },
-    );
+    if (status === 'evaluated') {
+      res = await db.query(
+        `SELECT *
+        FROM "Box_History" boxHistory1
+        INNER JOIN (
+            SELECT box_id, max(transaction_id) as MaxId
+            FROM "Box_History"
+            GROUP BY box_id
+        ) boxHistory2 ON boxHistory1.box_id = boxHistory2.box_id AND boxHistory1.transaction_id = boxHistory2.MaxId
+        WHERE
+          status='evaluated'
+          ${pickup ? 'AND pickup = $(pickup)' : ''}
+        ORDER BY
+          pickup, boxHistory1.box_id`,
+        { status, pickup },
+      );
+    } else {
+      res = await db.query(
+        `SELECT * FROM "Box_History"
+        WHERE
+          ($(status) = '' OR status = $(status))
+          ${pickup ? 'AND pickup = $(pickup)' : ''}
+        ORDER BY
+          pickup, box_id;`,
+        { status, pickup },
+      );
+    }
   } catch (err) {
     throw new Error(err.message);
   }
