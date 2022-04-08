@@ -32,6 +32,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       messageStatus,
       launchedOrganically,
       imageStatus,
+      admin,
     } = req.body;
     const response = await updateBox(
       status,
@@ -48,6 +49,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       messageStatus,
       launchedOrganically,
       imageStatus,
+      admin,
     );
     res.status(200).send(response);
   } catch (err) {
