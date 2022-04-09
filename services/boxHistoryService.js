@@ -125,7 +125,7 @@ const copyTransactionInfoToAnchorBox = async (
   let res = null;
   try {
     res = await db.query(
-      `UPDATE "Anchor_Box2"
+      `UPDATE "Anchor_Box"
       SET message = $1, zip_code = $2,
         picture = $3, general_location = $4,
         date=$5, launched_organically=$6, latitude=$8, longitude=$9, show_on_map=TRUE,
