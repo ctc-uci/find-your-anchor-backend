@@ -57,6 +57,7 @@ anchorBoxRouter.get('/locations', async (req, res) => {
  * ADDITIONAL output attributes:
  *  - zip_code: The box's zip code
  *  - country: The box's country
+ *  - custom: An attribute to indicate that this search is custom (used in frontend to conditionally render AdminMarkerInfo)
  */
 anchorBoxRouter.get('/search/', async (req, res) => {
   try {
