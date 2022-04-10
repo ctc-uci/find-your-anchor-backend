@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
@@ -39,6 +40,13 @@ app.use('/users', userRouter);
 app.use('/auth', authRouter);
 app.use('/nodemailer', emailRouter);
 app.use('/adminInvite', adminInviteRouter);
+
+// Required for heroku
+const root = path.join(__dirname, 'build');
+app.use(express.static(root));
+app.use('/*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
