@@ -39,6 +39,7 @@ const createAnchorBox = async (
   country,
   latitude,
   longitude,
+  showOnMap,
 ) => {
   let res = null;
   try {
@@ -46,8 +47,8 @@ const createAnchorBox = async (
       `INSERT INTO "Anchor_Box"
         (box_id, message,
         zip_code, picture, general_location,
-        date, launched_organically, additional_comments, country, latitude, longitude)
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        date, launched_organically, additional_comments, country, latitude, longitude, show_on_map)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING *;`,
       [
         boxNumber,
@@ -61,9 +62,11 @@ const createAnchorBox = async (
         country,
         latitude,
         longitude,
+        showOnMap,
       ],
     );
   } catch (err) {
+    console.log(err.message);
     throw new Error(err.message);
   }
   return res;
