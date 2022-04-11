@@ -77,11 +77,15 @@ const createAnchorBoxes = async (formDatas) => {
         date,
         launchedOrganically,
         additionalComments,
+        country,
+        showOnMap,
       }) => {
+        console.log(showOnMap);
+        console.log(country);
         multiBoxesQuery += `INSERT INTO "Anchor_Box"
         (box_id, message,
         zip_code, picture, general_location,
-        date, launched_organically, additional_comments)
+        date, launched_organically, additional_comments, country, latitude, longitude, )
         VALUES(
         ${boxNumber || `''`},
         ${message || `''`},
@@ -94,6 +98,7 @@ const createAnchorBoxes = async (formDatas) => {
       `;
       },
     );
+    console.log(multiBoxesQuery);
     res = await db.multi(multiBoxesQuery);
   } catch (err) {
     throw new Error(err.message);
