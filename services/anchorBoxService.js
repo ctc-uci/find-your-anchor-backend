@@ -63,6 +63,44 @@ const createAnchorBox = async (
   return res;
 };
 
+const createAnchorBoxes = async (formDatas) => {
+  let res = null;
+  try {
+    let multiBoxesQuery = ``;
+    formDatas.forEach(
+      ({
+        boxNumber,
+        message,
+        zipCode,
+        picture,
+        boxLocation,
+        date,
+        launchedOrganically,
+        additionalComments,
+      }) => {
+        multiBoxesQuery += `INSERT INTO "Anchor_Box"
+        (box_id, message,
+        zip_code, picture, general_location,
+        date, launched_organically, additional_comments)
+        VALUES(
+        ${boxNumber || `''`},
+        ${message || `''`},
+        ${`'${zipCode}'`},
+        ${picture || `''`},
+        ${boxLocation || `''`},
+        ${`'${date}'`},
+        ${launchedOrganically},
+        ${additionalComments || `''`});
+      `;
+      },
+    );
+    res = await db.multi(multiBoxesQuery);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
 const deleteAnchorBox = async (boxID) => {
   let res = null;
   try {
@@ -115,6 +153,7 @@ const getAllLocationInfo = async () => {
 module.exports = {
   findBoxId,
   createAnchorBox,
+  createAnchorBoxes,
   deleteAnchorBox,
   getAnchorBoxesByLocation,
   updateAnchorBox,
