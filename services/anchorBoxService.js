@@ -117,8 +117,9 @@ const getBoxesForSearch = async (query) => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT latitude as lat, longitude as lon, box_id as display_name, zip_code, country FROM "Anchor_Box" WHERE box_id = $1
-      AND latitude IS NOT NULL AND longitude IS NOT NULL AND country is NOT NULL AND zip_code IS NOT NULL AND show_on_map = TRUE`,
+      `SELECT latitude as lat, longitude as lon, box_id as display_name, zip_code, country FROM "Anchor_Box" WHERE box_id LIKE '%' || $1 || '%'
+      AND latitude IS NOT NULL AND longitude IS NOT NULL AND country is NOT NULL AND zip_code IS NOT NULL AND show_on_map = TRUE
+      ORDER BY box_id::int`,
       [query],
     );
   } catch (err) {
