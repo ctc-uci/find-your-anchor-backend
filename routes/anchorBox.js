@@ -5,7 +5,6 @@ const {
   createAnchorBoxes,
   deleteAnchorBox,
   getAnchorBoxesByLocation,
-  updateAnchorBox,
   getAllAnchorBoxesOnMap,
   getAllLocationInfo,
 } = require('../services/anchorBoxService');
@@ -92,13 +91,4 @@ anchorBoxRouter.delete('/:boxId', async (req, res) => {
   }
 });
 
-anchorBoxRouter.put('/update', async (req, res) => {
-  try {
-    const { boxID, showOnMap } = req.body;
-    const response = await updateAnchorBox(boxID, showOnMap);
-    res.status(200).send(response);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
 module.exports = anchorBoxRouter;
