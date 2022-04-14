@@ -223,6 +223,16 @@ const addBox = async (
   return res;
 };
 
+const deleteBox = async (boxID) => {
+  let res = null;
+  try {
+    res = await db.query('DELETE FROM "Box_History" WHERE box_id = $1', [boxID]);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
 module.exports = {
   getTransactionByID,
   getHistoryOfBox,
@@ -231,4 +241,5 @@ module.exports = {
   addBox,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
+  deleteBox,
 };
