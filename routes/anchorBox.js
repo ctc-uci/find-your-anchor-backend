@@ -2,9 +2,9 @@ const anchorBoxRouter = require('express-promise-router')();
 const {
   findBoxId,
   createAnchorBox,
+  createAnchorBoxes,
   deleteAnchorBox,
   getAnchorBoxesByLocation,
-  updateAnchorBox,
   getAllAnchorBoxesOnMap,
   getAllLocationInfo,
 } = require('../services/anchorBoxService');
@@ -72,25 +72,12 @@ anchorBoxRouter.post('/box', async (req, res) => {
   }
 });
 
-// TODO: Convert this route to use pg-promise's multi-query string feature: http://vitaly-t.github.io/pg-promise/Database.html#multi
 anchorBoxRouter.post('/boxes', async (req, res) => {
   try {
-    const formDatas = req.body;
-    formDatas.forEach(async (formData) => {
-      // Create anchor box
-      await createAnchorBox(
-        formData.boxNumber,
-        formData.message,
-        formData.picture,
-        formData.boxLocation,
-        formData.date,
-        formData.launchedOrganically,
-        formData.additionalComments,
-      );
-    });
-    res.status(200).send('upload success');
-  } catch (err) {
-    res.status(500).send(err.message);
+    const response = await createAnchorBoxes(req.body);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(500).send(error);
   }
 });
 
@@ -104,13 +91,4 @@ anchorBoxRouter.delete('/:boxId', async (req, res) => {
   }
 });
 
-anchorBoxRouter.put('/update', async (req, res) => {
-  try {
-    const { boxID, showOnMap } = req.body;
-    const response = await updateAnchorBox(boxID, showOnMap);
-    res.status(200).send(response);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
 module.exports = anchorBoxRouter;
