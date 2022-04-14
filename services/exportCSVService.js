@@ -4,9 +4,9 @@ const db = require('../config');
 const sortbyToSQL = (sortBy) => {
   switch (sortBy) {
     case 'ascend-box-num':
-      return 'box_id::int ASC';
+      return 'box_id ASC';
     case 'descend-box-num':
-      return 'box_id::int DESC';
+      return 'box_id DESC';
     case 'chronologic':
       return `TO_DATE(date, 'MM/DD/YYYY') ASC`;
     case 'ascend-zip-code':
@@ -14,7 +14,7 @@ const sortbyToSQL = (sortBy) => {
     case 'descend-zip-code':
       return 'zip_code DESC';
     default:
-      return 'box_id::int ASC';
+      return 'box_id ASC';
   }
 };
 
