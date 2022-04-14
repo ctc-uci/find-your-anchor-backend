@@ -126,7 +126,8 @@ const getAllLocationInfo = async () => {
   try {
     res = await db.query(
       `SELECT DISTINCT zip_code, country, latitude, longitude, COUNT (box_id) AS box_count FROM "Anchor_Box"
-      WHERE latitude IS NOT NULL AND longitude IS NOT NULL GROUP BY zip_code, country, latitude, longitude`,
+      WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND country IS NOT NULL
+      GROUP BY zip_code, country, latitude, longitude`,
     );
   } catch (err) {
     throw new Error(err.message);
