@@ -4,7 +4,7 @@ const getAnchorBoxesByLocation = async (zipCode, country) => {
   let res = null;
   try {
     res = await db.query(
-      'SELECT * FROM "Anchor_Box" WHERE zip_code = $1 AND country = $2 AND show_on_map = TRUE ORDER BY box_id',
+      'SELECT * FROM "Anchor_Box" WHERE zip_code = $1 AND country = $2 ORDER BY box_id',
       [zipCode, country],
     );
   } catch (err) {
@@ -19,7 +19,7 @@ const findBoxId = async (id) => {
     res = await db.query(
       `SELECT * FROM "Anchor_Box"
       WHERE box_id = $1`,
-      [id],
+      [id.toString()],
     );
   } catch (err) {
     throw new Error(err.message);
@@ -63,23 +63,48 @@ const createAnchorBox = async (
   return res;
 };
 
-const deleteAnchorBox = async (boxID) => {
+const createAnchorBoxes = async (formDatas) => {
   let res = null;
   try {
-    res = await db.query('DELETE FROM "Anchor_Box" WHERE box_id = $1 RETURNING *;', [boxID]);
+    let multiBoxesQuery = ``;
+    formDatas.forEach(
+      ({
+        boxNumber,
+        message,
+        zipCode,
+        picture,
+        boxLocation,
+        date,
+        launchedOrganically,
+        additionalComments,
+      }) => {
+        multiBoxesQuery += `INSERT INTO "Anchor_Box"
+        (box_id, message,
+        zip_code, picture, general_location,
+        date, launched_organically, additional_comments)
+        VALUES(
+        ${boxNumber || `''`},
+        ${message || `''`},
+        ${`'${zipCode}'`},
+        ${picture || `''`},
+        ${boxLocation || `''`},
+        ${`'${date}'`},
+        ${launchedOrganically},
+        ${additionalComments || `''`});
+      `;
+      },
+    );
+    res = await db.multi(multiBoxesQuery);
   } catch (err) {
     throw new Error(err.message);
   }
   return res;
 };
 
-const updateAnchorBox = async (boxID, showOnMap) => {
+const deleteAnchorBox = async (boxID) => {
   let res = null;
   try {
-    res = await db.query(
-      'UPDATE "Anchor_Box" SET show_on_map = $2 WHERE box_id = $1 RETURNING *;',
-      [boxID, showOnMap],
-    );
+    res = await db.query('DELETE FROM "Anchor_Box" WHERE box_id = $1 RETURNING *;', [boxID]);
   } catch (err) {
     throw new Error(err.message);
   }
@@ -91,7 +116,7 @@ const getAllAnchorBoxesOnMap = async () => {
   try {
     res = await db.query(
       `SELECT * FROM "Anchor_Box"
-      WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND zip_code IS NOT NULL AND country IS NOT NULL AND show_on_map=TRUE`,
+      WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND zip_code IS NOT NULL AND country IS NOT NULL`,
     );
   } catch (err) {
     throw new Error(err.message);
@@ -104,7 +129,7 @@ const getAllLocationInfo = async () => {
   try {
     res = await db.query(
       `SELECT DISTINCT zip_code, country, latitude, longitude, COUNT (box_id) AS box_count FROM "Anchor_Box"
-      WHERE show_on_map=TRUE AND latitude IS NOT NULL AND longitude IS NOT NULL AND country IS NOT NULL AND zip_code IS NOT NULL
+      WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND country IS NOT NULL AND zip_code IS NOT NULL
       GROUP BY zip_code, country, latitude, longitude`,
     );
   } catch (err) {
@@ -118,7 +143,7 @@ const getBoxesForSearch = async (query) => {
   try {
     res = await db.query(
       `SELECT latitude as lat, longitude as lon, box_id as display_name, zip_code, country FROM "Anchor_Box" WHERE box_id LIKE '%' || $1 || '%'
-      AND latitude IS NOT NULL AND longitude IS NOT NULL AND country is NOT NULL AND zip_code IS NOT NULL AND show_on_map = TRUE
+      AND latitude IS NOT NULL AND longitude IS NOT NULL AND country is NOT NULL AND zip_code IS NOT NULL
       ORDER BY box_id::int`,
       [query],
     );
@@ -131,9 +156,9 @@ const getBoxesForSearch = async (query) => {
 module.exports = {
   findBoxId,
   createAnchorBox,
+  createAnchorBoxes,
   deleteAnchorBox,
   getAnchorBoxesByLocation,
-  updateAnchorBox,
   getAllAnchorBoxesOnMap,
   getAllLocationInfo,
   getBoxesForSearch,
