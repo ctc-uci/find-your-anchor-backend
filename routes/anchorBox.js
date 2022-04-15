@@ -57,7 +57,6 @@ anchorBoxRouter.post('/box', async (req, res) => {
       launchedOrganically,
       latitude,
       longitude,
-      showOnMap,
     } = req.body;
     // Create anchor box
     const newAnchorBox = await createAnchorBox(
@@ -72,7 +71,6 @@ anchorBoxRouter.post('/box', async (req, res) => {
       country,
       latitude,
       longitude,
-      showOnMap,
     );
     res.status(200).send(newAnchorBox);
   } catch (error) {
