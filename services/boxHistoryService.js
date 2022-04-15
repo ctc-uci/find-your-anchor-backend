@@ -40,6 +40,7 @@ const updateBox = async (
   boxHolderName,
   boxHolderEmail,
   zipCode,
+  country,
   generalLocation,
   message,
   changesRequested,
@@ -58,6 +59,7 @@ const updateBox = async (
         ${boxHolderName !== undefined ? ', boxholder_name = $(boxHolderName)' : ''}
         ${boxHolderEmail !== undefined ? ', boxholder_email = $(boxHolderEmail)' : ''}
         ${zipCode !== undefined ? ', zip_code = $(zipCode)' : ''}
+        ${country !== undefined ? ', country = $(country)' : ''}
         ${generalLocation !== undefined ? ', general_location = $(generalLocation)' : ''}
         ${message !== undefined ? ', message = $(message)' : ''}
         ${changesRequested !== undefined ? ', changes_requested = $(changesRequested)' : ''}
@@ -78,6 +80,7 @@ const updateBox = async (
         boxHolderName,
         boxHolderEmail,
         zipCode,
+        country,
         generalLocation,
         message,
         changesRequested,
