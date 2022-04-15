@@ -48,23 +48,29 @@ anchorBoxRouter.post('/box', async (req, res) => {
     const {
       boxNumber,
       date,
-      zipCode,
+      zipcode,
       boxLocation,
+      country,
       message,
       picture,
       comments,
       launchedOrganically,
+      latitude,
+      longitude,
     } = req.body;
     // Create anchor box
     const newAnchorBox = await createAnchorBox(
       boxNumber,
       message,
-      zipCode,
+      zipcode,
       picture,
       boxLocation,
       date,
       launchedOrganically,
       comments,
+      country,
+      latitude,
+      longitude,
     );
     res.status(200).send(newAnchorBox);
   } catch (error) {
