@@ -5,7 +5,6 @@ const {
   createAnchorBoxes,
   deleteAnchorBox,
   getAnchorBoxesByLocation,
-  updateAnchorBox,
   getAllAnchorBoxesOnMap,
   getAllLocationInfo,
 } = require('../services/anchorBoxService');
@@ -81,7 +80,6 @@ anchorBoxRouter.post('/box', async (req, res) => {
   }
 });
 
-// TODO: Convert this route to use pg-promise's multi-query string feature: http://vitaly-t.github.io/pg-promise/Database.html#multi
 anchorBoxRouter.post('/boxes', async (req, res) => {
   try {
     const response = await createAnchorBoxes(req.body);
@@ -101,13 +99,4 @@ anchorBoxRouter.delete('/:boxId', async (req, res) => {
   }
 });
 
-anchorBoxRouter.put('/update', async (req, res) => {
-  try {
-    const { boxID, showOnMap } = req.body;
-    const response = await updateAnchorBox(boxID, showOnMap);
-    res.status(200).send(response);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
 module.exports = anchorBoxRouter;
