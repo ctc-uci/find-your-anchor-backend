@@ -17,7 +17,7 @@ const findBoxId = async (id) => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT box_id FROM "Anchor_Box"
+      `SELECT * FROM "Anchor_Box"
       WHERE box_id = $1`,
       [id.toString()],
     );
@@ -127,7 +127,10 @@ const deleteAnchorBox = async (boxID) => {
 const getAllAnchorBoxesOnMap = async () => {
   let res = null;
   try {
-    res = await db.query(`SELECT * FROM "Anchor_Box"`);
+    res = await db.query(
+      `SELECT * FROM "Anchor_Box"
+      WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND zip_code IS NOT NULL AND country IS NOT NULL`,
+    );
   } catch (err) {
     throw new Error(err.message);
   }
@@ -139,8 +142,23 @@ const getAllLocationInfo = async () => {
   try {
     res = await db.query(
       `SELECT DISTINCT zip_code, country, latitude, longitude, COUNT (box_id) AS box_count FROM "Anchor_Box"
-      WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND country IS NOT NULL
+      WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND country IS NOT NULL AND zip_code IS NOT NULL
       GROUP BY zip_code, country, latitude, longitude`,
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
+const getBoxesForSearch = async (query) => {
+  let res = null;
+  try {
+    res = await db.query(
+      `SELECT latitude as lat, longitude as lon, box_id as display_name, zip_code, country FROM "Anchor_Box" WHERE box_id LIKE '%' || $1 || '%'
+      AND latitude IS NOT NULL AND longitude IS NOT NULL AND country is NOT NULL AND zip_code IS NOT NULL
+      ORDER BY box_id::int`,
+      [query],
     );
   } catch (err) {
     throw new Error(err.message);
@@ -156,4 +174,5 @@ module.exports = {
   getAnchorBoxesByLocation,
   getAllAnchorBoxesOnMap,
   getAllLocationInfo,
+  getBoxesForSearch,
 };
