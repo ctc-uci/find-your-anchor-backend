@@ -26,6 +26,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       boxHolderName,
       boxHolderEmail,
       zipCode,
+      country,
       generalLocation,
       message,
       changesRequested,
@@ -42,6 +43,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       boxHolderName,
       boxHolderEmail,
       zipCode,
+      country,
       generalLocation,
       message,
       changesRequested,
@@ -158,6 +160,7 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
     await copyTransactionInfoToAnchorBox(
       approvedBox[0].message,
       approvedBox[0].zip_code,
+      approvedBox[0].country,
       approvedBox[0].picture,
       approvedBox[0].general_location,
       approvedBox[0].date,
