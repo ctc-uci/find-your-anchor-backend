@@ -181,6 +181,7 @@ const addBox = async (
   rejectionReason,
   messageStatus,
   zipcode,
+  country,
   date,
   launchedOrganically,
   imageStatus,
@@ -192,13 +193,13 @@ const addBox = async (
         box_id, message, boxholder_email, boxholder_name,
         general_location, picture, approved, status,
         pickup, changes_requested, rejection_reason, message_status,
-        zip_code, date, launched_organically, image_status
+        zip_code, date, launched_organically, image_status, country
       )
       VALUES (
         $(boxID), $(message), $(boxholderEmail), $(boxholderName),
         $(generalLocation), $(picture), $(approved), $(status),
         $(pickup), $(changesRequested), $(rejectionReason), $(messageStatus),
-        $(zipcode), $(date), $(launchedOrganically), $(imageStatus)
+        $(zipcode), $(date), $(launchedOrganically), $(imageStatus), $(country)
       )
       RETURNING *;`,
       {
@@ -218,6 +219,7 @@ const addBox = async (
         date,
         launchedOrganically,
         imageStatus,
+        country,
       },
     );
   } catch (err) {

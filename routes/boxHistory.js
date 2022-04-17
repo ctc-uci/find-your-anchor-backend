@@ -74,6 +74,7 @@ boxHistoryRouter.post('/', async (req, res) => {
       rejectionReason,
       messageStatus,
       zipcode,
+      country,
       date,
       launchedOrganically,
       imageStatus,
@@ -84,7 +85,6 @@ boxHistoryRouter.post('/', async (req, res) => {
       Object.prototype.hasOwnProperty.call(req.body, param),
     );
     if (missingParams) return res.status(400).send('Missing a required parameter');
-
     // Check if box exists in anchor box
     const matchingBox = await findBoxId(boxID);
     if (matchingBox.length === 0) return res.status(400).send('Could not a find box with that ID');
@@ -102,6 +102,7 @@ boxHistoryRouter.post('/', async (req, res) => {
       rejectionReason,
       messageStatus,
       zipcode,
+      country,
       date,
       launchedOrganically,
       imageStatus,
