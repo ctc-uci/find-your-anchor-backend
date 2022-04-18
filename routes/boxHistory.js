@@ -170,6 +170,7 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
       longitude,
       approvedBox[0].boxholder_name,
       approvedBox[0].boxholder_email,
+      approvedBox[0].pickup,
     );
     res.status(200).send('Successfully approved box');
   } catch (err) {
