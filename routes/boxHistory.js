@@ -9,6 +9,7 @@ const {
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
   getHistoryOfBox,
+  deleteBox,
 } = require('../services/boxHistoryService');
 const { findBoxId } = require('../services/anchorBoxService');
 
@@ -25,6 +26,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       boxHolderName,
       boxHolderEmail,
       zipCode,
+      country,
       generalLocation,
       message,
       changesRequested,
@@ -42,6 +44,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       boxHolderName,
       boxHolderEmail,
       zipCode,
+      country,
       generalLocation,
       message,
       changesRequested,
@@ -73,6 +76,7 @@ boxHistoryRouter.post('/', async (req, res) => {
       rejectionReason,
       messageStatus,
       zipcode,
+      country,
       date,
       launchedOrganically,
       imageStatus,
@@ -83,7 +87,6 @@ boxHistoryRouter.post('/', async (req, res) => {
       Object.prototype.hasOwnProperty.call(req.body, param),
     );
     if (missingParams) return res.status(400).send('Missing a required parameter');
-
     // Check if box exists in anchor box
     const matchingBox = await findBoxId(boxID);
     if (matchingBox.length === 0) return res.status(400).send('Could not a find box with that ID');
@@ -101,6 +104,7 @@ boxHistoryRouter.post('/', async (req, res) => {
       rejectionReason,
       messageStatus,
       zipcode,
+      country,
       date,
       launchedOrganically,
       imageStatus,
@@ -158,6 +162,7 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
     await copyTransactionInfoToAnchorBox(
       approvedBox[0].message,
       approvedBox[0].zip_code,
+      approvedBox[0].country,
       approvedBox[0].picture,
       approvedBox[0].general_location,
       approvedBox[0].date,
@@ -169,6 +174,16 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
       approvedBox[0].boxholder_email,
     );
     res.status(200).send('Successfully approved box');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+boxHistoryRouter.delete('/:boxID', async (req, res) => {
+  try {
+    const { boxID } = req.params;
+    await deleteBox(boxID);
+    res.status(200).send(`Successfully deleted box ${boxID}`);
   } catch (err) {
     res.status(500).send(err.message);
   }

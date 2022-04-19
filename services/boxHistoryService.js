@@ -58,6 +58,7 @@ const updateBox = async (
   boxHolderName,
   boxHolderEmail,
   zipCode,
+  country,
   generalLocation,
   message,
   changesRequested,
@@ -77,6 +78,7 @@ const updateBox = async (
         ${boxHolderName !== undefined ? ', boxholder_name = $(boxHolderName)' : ''}
         ${boxHolderEmail !== undefined ? ', boxholder_email = $(boxHolderEmail)' : ''}
         ${zipCode !== undefined ? ', zip_code = $(zipCode)' : ''}
+        ${country !== undefined ? ', country = $(country)' : ''}
         ${generalLocation !== undefined ? ', general_location = $(generalLocation)' : ''}
         ${message !== undefined ? ', message = $(message)' : ''}
         ${changesRequested !== undefined ? ', changes_requested = $(changesRequested)' : ''}
@@ -98,6 +100,7 @@ const updateBox = async (
         boxHolderName,
         boxHolderEmail,
         zipCode,
+        country,
         generalLocation,
         message,
         changesRequested,
@@ -133,6 +136,7 @@ const approveTransactionInBoxHistory = async (id) => {
 const copyTransactionInfoToAnchorBox = async (
   message,
   zipCode,
+  country,
   picture,
   generalLocation,
   date,
@@ -149,7 +153,7 @@ const copyTransactionInfoToAnchorBox = async (
       `UPDATE "Anchor_Box"
       SET message = $1, zip_code = $2,
         picture = $3, general_location = $4,
-        date=$5, launched_organically=$6, latitude=$8, longitude=$9, show_on_map=TRUE,
+        date=$5, launched_organically=$6, country=$12, latitude=$8, longitude=$9,
         boxholder_name=$10, boxholder_email=$11
       WHERE
         box_id = $7`,
@@ -165,6 +169,7 @@ const copyTransactionInfoToAnchorBox = async (
         longitude,
         boxHolderName,
         boxHolderEmail,
+        country,
       ],
     );
   } catch (err) {
@@ -199,6 +204,7 @@ const addBox = async (
   rejectionReason,
   messageStatus,
   zipcode,
+  country,
   date,
   launchedOrganically,
   imageStatus,
@@ -210,13 +216,13 @@ const addBox = async (
         box_id, message, boxholder_email, boxholder_name,
         general_location, picture, approved, status,
         pickup, changes_requested, rejection_reason, message_status,
-        zip_code, date, launched_organically, image_status
+        zip_code, date, launched_organically, image_status, country
       )
       VALUES (
         $(boxID), $(message), $(boxholderEmail), $(boxholderName),
         $(generalLocation), $(picture), $(approved), $(status),
         $(pickup), $(changesRequested), $(rejectionReason), $(messageStatus),
-        $(zipcode), $(date), $(launchedOrganically), $(imageStatus)
+        $(zipcode), $(date), $(launchedOrganically), $(imageStatus), $(country)
       )
       RETURNING *;`,
       {
@@ -236,8 +242,19 @@ const addBox = async (
         date,
         launchedOrganically,
         imageStatus,
+        country,
       },
     );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
+const deleteBox = async (boxID) => {
+  let res = null;
+  try {
+    res = await db.query('DELETE FROM "Box_History" WHERE box_id = $1', [boxID]);
   } catch (err) {
     throw new Error(err.message);
   }
@@ -252,4 +269,5 @@ module.exports = {
   addBox,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
+  deleteBox,
 };
