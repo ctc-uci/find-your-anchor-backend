@@ -80,6 +80,7 @@ boxHistoryRouter.post('/', async (req, res) => {
       date,
       launchedOrganically,
       imageStatus,
+      verificationPicture,
     } = req.body;
     // Check for required parameters
     const requiredParams = ['boxID', 'boxholderEmail', 'zipcode', 'date'];
@@ -108,6 +109,7 @@ boxHistoryRouter.post('/', async (req, res) => {
       date,
       launchedOrganically,
       imageStatus,
+      verificationPicture,
     );
     return res.status(200).send(response);
   } catch (err) {
