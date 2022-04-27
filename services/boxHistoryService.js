@@ -50,6 +50,27 @@ const getBoxesWithStatusOrPickup = async (status, pickup) => {
   return res;
 };
 
+const getMostRecentTransaction = async (boxId) => {
+  let res = null;
+  try {
+    res = await db.query(
+      `SELECT *
+        FROM "Box_History" boxHistory1
+        INNER JOIN (
+            SELECT box_id, max(date) as mostRecentDate
+            FROM "Box_History"
+            GROUP BY box_id
+        ) boxHistory2 ON boxHistory1.box_id = boxHistory2.box_id AND boxHistory1.date = boxHistory2.mostRecentDate
+        WHERE
+          boxHistory1.box_id = $1`,
+      [boxId],
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
 const updateBox = async (
   status,
   approved,
@@ -182,7 +203,7 @@ const getHistoryOfBox = async (boxID) => {
   let res = null;
   try {
     res = await db.query(
-      'SELECT * FROM "Box_History" WHERE status = \'evaluated\' AND approved = TRUE AND box_id = $1 AND pickup = FALSE ORDER BY date DESC',
+      'SELECT * FROM "Box_History" WHERE status = \'evaluated\' AND approved = TRUE AND box_id = $1 ORDER BY date DESC, transaction_id',
       [boxID],
     );
   } catch (err) {
@@ -261,6 +282,16 @@ const deleteBox = async (boxID) => {
   return res;
 };
 
+const deleteTransaction = async (transactionID) => {
+  let res = null;
+  try {
+    res = await db.query('DELETE FROM "Box_History" WHERE transaction_id = $1', [transactionID]);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+};
+
 module.exports = {
   getTransactionByID,
   getHistoryOfBox,
@@ -270,4 +301,6 @@ module.exports = {
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
   deleteBox,
+  deleteTransaction,
+  getMostRecentTransaction,
 };

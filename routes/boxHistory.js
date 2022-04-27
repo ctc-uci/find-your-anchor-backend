@@ -10,6 +10,8 @@ const {
   copyTransactionInfoToAnchorBox,
   getHistoryOfBox,
   deleteBox,
+  deleteTransaction,
+  getMostRecentTransaction,
 } = require('../services/boxHistoryService');
 const { findBoxId } = require('../services/anchorBoxService');
 
@@ -179,11 +181,31 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
   }
 });
 
-boxHistoryRouter.delete('/:boxID', async (req, res) => {
+boxHistoryRouter.delete('/box/:boxID', async (req, res) => {
   try {
     const { boxID } = req.params;
     await deleteBox(boxID);
     res.status(200).send(`Successfully deleted box ${boxID}`);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+boxHistoryRouter.delete('/transaction/:transactionID', async (req, res) => {
+  try {
+    const { transactionID } = req.params;
+    await deleteTransaction(transactionID);
+    res.status(200).send(`Successfully deleted transaction ${transactionID}`);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+boxHistoryRouter.get('/mostRecentTransaction/:boxID', async (req, res) => {
+  try {
+    const { boxID } = req.params;
+    const mostRecentTransaction = await getMostRecentTransaction(boxID);
+    res.status(200).send(mostRecentTransaction);
   } catch (err) {
     res.status(500).send(err.message);
   }
