@@ -159,22 +159,24 @@ boxHistoryRouter.get('/history/:boxID', async (req, res) => {
 // Approves a row in box history and then copies the relevant box information into Anchor Box
 boxHistoryRouter.put('/approveBox', async (req, res) => {
   try {
-    const { transactionID, latitude, longitude } = req.body;
+    const { transactionID, latitude, longitude, isMostRecentDate } = req.body;
     const approvedBox = await approveTransactionInBoxHistory(transactionID);
-    await copyTransactionInfoToAnchorBox(
-      approvedBox[0].message,
-      approvedBox[0].zip_code,
-      approvedBox[0].country,
-      approvedBox[0].picture,
-      approvedBox[0].general_location,
-      approvedBox[0].date,
-      approvedBox[0].launched_organically,
-      approvedBox[0].box_id,
-      latitude,
-      longitude,
-      approvedBox[0].boxholder_name,
-      approvedBox[0].boxholder_email,
-    );
+    if (isMostRecentDate) {
+      await copyTransactionInfoToAnchorBox(
+        approvedBox[0].message,
+        approvedBox[0].zip_code,
+        approvedBox[0].country,
+        approvedBox[0].picture,
+        approvedBox[0].general_location,
+        approvedBox[0].date,
+        approvedBox[0].launched_organically,
+        approvedBox[0].box_id,
+        latitude,
+        longitude,
+        approvedBox[0].boxholder_name,
+        approvedBox[0].boxholder_email,
+      );
+    }
     res.status(200).send('Successfully approved box');
   } catch (err) {
     res.status(500).send(err.message);
