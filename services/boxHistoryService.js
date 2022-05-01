@@ -59,6 +59,7 @@ const getMostRecentTransaction = async (boxId) => {
         INNER JOIN (
             SELECT box_id, max(date) as mostRecentDate
             FROM "Box_History"
+            WHERE status = 'evaluated' AND approved = TRUE
             GROUP BY box_id
         ) boxHistory2 ON boxHistory1.box_id = boxHistory2.box_id AND boxHistory1.date = boxHistory2.mostRecentDate
         WHERE
