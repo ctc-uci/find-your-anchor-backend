@@ -14,7 +14,7 @@ const getTransactionByID = async (transactionID) => {
   return res;
 };
 
-const getBoxesWithStatusOrPickup = async (status, pickup) => {
+const getBoxesWithStatusOrPickup = async (status) => {
   let res = null;
   try {
     if (status === 'evaluated') {
@@ -28,20 +28,18 @@ const getBoxesWithStatusOrPickup = async (status, pickup) => {
         ) boxHistory2 ON boxHistory1.box_id = boxHistory2.box_id AND boxHistory1.transaction_id = boxHistory2.MaxId
         WHERE
           status='evaluated'
-          ${pickup ? 'AND pickup = $(pickup)' : ''}
         ORDER BY
           pickup, boxHistory1.box_id`,
-        { status, pickup },
+        { status },
       );
     } else {
       res = await db.query(
         `SELECT * FROM "Box_History"
         WHERE
           ($(status) = '' OR status = $(status))
-          ${pickup ? 'AND pickup = $(pickup)' : ''}
         ORDER BY
           pickup, box_id;`,
-        { status, pickup },
+        { status },
       );
     }
   } catch (err) {
@@ -155,7 +153,7 @@ const copyTransactionInfoToAnchorBox = async (
       SET message = $1, zip_code = $2,
         picture = $3, general_location = $4,
         date=$5, launched_organically=$6, country=$12, latitude=$8, longitude=$9,
-        boxholder_name=$10, boxholder_email=$11, pickup = $12
+        boxholder_name=$10, boxholder_email=$11, pickup = $13
       WHERE
         box_id = $7`,
       [
