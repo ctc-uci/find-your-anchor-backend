@@ -153,7 +153,7 @@ const copyTransactionInfoToAnchorBox = async (
       SET message = $1, zip_code = $2,
         picture = $3, general_location = $4,
         date=$5, launched_organically=$6, country=$12, latitude=$8, longitude=$9,
-        boxholder_name=$10, boxholder_email=$11, pickup = $12
+        boxholder_name=$10, boxholder_email=$11, pickup = $13
       WHERE
         box_id = $7`,
       [
