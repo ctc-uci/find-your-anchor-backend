@@ -167,6 +167,7 @@ const copyTransactionInfoToAnchorBox = async (
   longitude,
   boxHolderName,
   boxHolderEmail,
+  pickup,
 ) => {
   let res = null;
   try {
@@ -175,7 +176,7 @@ const copyTransactionInfoToAnchorBox = async (
       SET message = $1, zip_code = $2,
         picture = $3, general_location = $4,
         date=$5, launched_organically=$6, country=$12, latitude=$8, longitude=$9,
-        boxholder_name=$10, boxholder_email=$11
+        boxholder_name=$10, boxholder_email=$11, pickup = $13
       WHERE
         box_id = $7`,
       [
@@ -191,6 +192,7 @@ const copyTransactionInfoToAnchorBox = async (
         boxHolderName,
         boxHolderEmail,
         country,
+        pickup,
       ],
     );
   } catch (err) {
@@ -229,6 +231,7 @@ const addBox = async (
   date,
   launchedOrganically,
   imageStatus,
+  verificationPicture,
 ) => {
   let res = null;
   try {
@@ -237,13 +240,13 @@ const addBox = async (
         box_id, message, boxholder_email, boxholder_name,
         general_location, picture, approved, status,
         pickup, changes_requested, rejection_reason, message_status,
-        zip_code, date, launched_organically, image_status, country
+        zip_code, date, launched_organically, image_status, country, verification_picture
       )
       VALUES (
         $(boxID), $(message), $(boxholderEmail), $(boxholderName),
         $(generalLocation), $(picture), $(approved), $(status),
         $(pickup), $(changesRequested), $(rejectionReason), $(messageStatus),
-        $(zipcode), $(date), $(launchedOrganically), $(imageStatus), $(country)
+        $(zipcode), $(date), $(launchedOrganically), $(imageStatus), $(country), $(verificationPicture)
       )
       RETURNING *;`,
       {
@@ -264,6 +267,7 @@ const addBox = async (
         launchedOrganically,
         imageStatus,
         country,
+        verificationPicture,
       },
     );
   } catch (err) {

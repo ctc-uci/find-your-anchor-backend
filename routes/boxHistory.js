@@ -82,6 +82,7 @@ boxHistoryRouter.post('/', async (req, res) => {
       date,
       launchedOrganically,
       imageStatus,
+      verificationPicture,
     } = req.body;
     // Check for required parameters
     const requiredParams = ['boxID', 'boxholderEmail', 'zipcode', 'date'];
@@ -110,6 +111,7 @@ boxHistoryRouter.post('/', async (req, res) => {
       date,
       launchedOrganically,
       imageStatus,
+      verificationPicture,
     );
     return res.status(200).send(response);
   } catch (err) {
@@ -175,6 +177,7 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
         longitude,
         approvedBox[0].boxholder_name,
         approvedBox[0].boxholder_email,
+        approvedBox[0].pickup,
       );
     }
     res.status(200).send('Successfully approved box');
