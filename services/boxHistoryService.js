@@ -14,18 +14,34 @@ const getTransactionByID = async (transactionID) => {
   return res;
 };
 
-const getBoxesWithStatusOrPickup = async (status, pickup) => {
+const getBoxesWithStatusOrPickup = async (status) => {
   let res = null;
   try {
-    res = await db.query(
-      `SELECT * FROM "Box_History"
-      WHERE
-        ($(status) = '' OR status = $(status))
-        ${pickup ? 'AND pickup = $(pickup)' : ''}
-      ORDER BY
-        pickup, box_id;`,
-      { status, pickup },
-    );
+    if (status === 'evaluated') {
+      res = await db.query(
+        `SELECT *
+        FROM "Box_History" boxHistory1
+        INNER JOIN (
+            SELECT box_id, max(transaction_id) as MaxId
+            FROM "Box_History"
+            GROUP BY box_id
+        ) boxHistory2 ON boxHistory1.box_id = boxHistory2.box_id AND boxHistory1.transaction_id = boxHistory2.MaxId
+        WHERE
+          status='evaluated'
+        ORDER BY
+          pickup, boxHistory1.box_id`,
+        { status },
+      );
+    } else {
+      res = await db.query(
+        `SELECT * FROM "Box_History"
+        WHERE
+          ($(status) = '' OR status = $(status))
+        ORDER BY
+          pickup, box_id;`,
+        { status },
+      );
+    }
   } catch (err) {
     throw new Error(err.message);
   }
@@ -40,6 +56,7 @@ const updateBox = async (
   boxHolderName,
   boxHolderEmail,
   zipCode,
+  country,
   generalLocation,
   message,
   changesRequested,
@@ -47,6 +64,7 @@ const updateBox = async (
   messageStatus,
   launchedOrganically,
   imageStatus,
+  admin,
 ) => {
   let res = null;
   try {
@@ -58,6 +76,7 @@ const updateBox = async (
         ${boxHolderName !== undefined ? ', boxholder_name = $(boxHolderName)' : ''}
         ${boxHolderEmail !== undefined ? ', boxholder_email = $(boxHolderEmail)' : ''}
         ${zipCode !== undefined ? ', zip_code = $(zipCode)' : ''}
+        ${country !== undefined ? ', country = $(country)' : ''}
         ${generalLocation !== undefined ? ', general_location = $(generalLocation)' : ''}
         ${message !== undefined ? ', message = $(message)' : ''}
         ${changesRequested !== undefined ? ', changes_requested = $(changesRequested)' : ''}
@@ -67,6 +86,7 @@ const updateBox = async (
           launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
         }
         ${imageStatus !== undefined ? ', image_status = $(imageStatus)' : ''}
+        ${admin !== undefined ? ', admin = $(admin)' : ''}
       WHERE
         transaction_id = $(transactionID)
       RETURNING *`,
@@ -78,6 +98,7 @@ const updateBox = async (
         boxHolderName,
         boxHolderEmail,
         zipCode,
+        country,
         generalLocation,
         message,
         changesRequested,
@@ -85,6 +106,7 @@ const updateBox = async (
         messageStatus,
         launchedOrganically,
         imageStatus,
+        admin,
       },
     );
   } catch (err) {
@@ -112,6 +134,7 @@ const approveTransactionInBoxHistory = async (id) => {
 const copyTransactionInfoToAnchorBox = async (
   message,
   zipCode,
+  country,
   picture,
   generalLocation,
   date,
@@ -121,6 +144,7 @@ const copyTransactionInfoToAnchorBox = async (
   longitude,
   boxHolderName,
   boxHolderEmail,
+  pickup,
 ) => {
   let res = null;
   try {
@@ -128,8 +152,8 @@ const copyTransactionInfoToAnchorBox = async (
       `UPDATE "Anchor_Box"
       SET message = $1, zip_code = $2,
         picture = $3, general_location = $4,
-        date=$5, launched_organically=$6, latitude=$8, longitude=$9,
-        boxholder_name=$10, boxholder_email=$11
+        date=$5, launched_organically=$6, country=$12, latitude=$8, longitude=$9,
+        boxholder_name=$10, boxholder_email=$11, pickup = $13
       WHERE
         box_id = $7`,
       [
@@ -144,6 +168,8 @@ const copyTransactionInfoToAnchorBox = async (
         longitude,
         boxHolderName,
         boxHolderEmail,
+        country,
+        pickup,
       ],
     );
   } catch (err) {
@@ -156,7 +182,7 @@ const getHistoryOfBox = async (boxID) => {
   let res = null;
   try {
     res = await db.query(
-      'SELECT * FROM "Box_History" WHERE status = \'evaluated\' AND approved = TRUE AND box_id = $1 AND pickup = FALSE ORDER BY date DESC',
+      'SELECT * FROM "Box_History" WHERE status = \'evaluated\' AND approved = TRUE AND box_id = $1 ORDER BY date DESC',
       [boxID],
     );
   } catch (err) {
@@ -178,9 +204,11 @@ const addBox = async (
   rejectionReason,
   messageStatus,
   zipcode,
+  country,
   date,
   launchedOrganically,
   imageStatus,
+  verificationPicture,
 ) => {
   let res = null;
   try {
@@ -189,13 +217,13 @@ const addBox = async (
         box_id, message, boxholder_email, boxholder_name,
         general_location, picture, approved, status,
         pickup, changes_requested, rejection_reason, message_status,
-        zip_code, date, launched_organically, image_status
+        zip_code, date, launched_organically, image_status, country, verification_picture
       )
       VALUES (
         $(boxID), $(message), $(boxholderEmail), $(boxholderName),
         $(generalLocation), $(picture), $(approved), $(status),
         $(pickup), $(changesRequested), $(rejectionReason), $(messageStatus),
-        $(zipcode), $(date), $(launchedOrganically), $(imageStatus)
+        $(zipcode), $(date), $(launchedOrganically), $(imageStatus), $(country), $(verificationPicture)
       )
       RETURNING *;`,
       {
@@ -215,6 +243,8 @@ const addBox = async (
         date,
         launchedOrganically,
         imageStatus,
+        country,
+        verificationPicture,
       },
     );
   } catch (err) {

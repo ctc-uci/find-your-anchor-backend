@@ -26,6 +26,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       boxHolderName,
       boxHolderEmail,
       zipCode,
+      country,
       generalLocation,
       message,
       changesRequested,
@@ -33,6 +34,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       messageStatus,
       launchedOrganically,
       imageStatus,
+      admin,
     } = req.body;
     const response = await updateBox(
       status,
@@ -42,6 +44,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       boxHolderName,
       boxHolderEmail,
       zipCode,
+      country,
       generalLocation,
       message,
       changesRequested,
@@ -49,6 +52,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
       messageStatus,
       launchedOrganically,
       imageStatus,
+      admin,
     );
     res.status(200).send(response);
   } catch (err) {
@@ -72,9 +76,11 @@ boxHistoryRouter.post('/', async (req, res) => {
       rejectionReason,
       messageStatus,
       zipcode,
+      country,
       date,
       launchedOrganically,
       imageStatus,
+      verificationPicture,
     } = req.body;
     // Check for required parameters
     const requiredParams = ['boxID', 'boxholderEmail', 'zipcode', 'date'];
@@ -82,7 +88,6 @@ boxHistoryRouter.post('/', async (req, res) => {
       Object.prototype.hasOwnProperty.call(req.body, param),
     );
     if (missingParams) return res.status(400).send('Missing a required parameter');
-
     // Check if box exists in anchor box
     const matchingBox = await findBoxId(boxID);
     if (matchingBox.length === 0) return res.status(400).send('Could not a find box with that ID');
@@ -100,9 +105,11 @@ boxHistoryRouter.post('/', async (req, res) => {
       rejectionReason,
       messageStatus,
       zipcode,
+      country,
       date,
       launchedOrganically,
       imageStatus,
+      verificationPicture,
     );
     return res.status(200).send(response);
   } catch (err) {
@@ -157,6 +164,7 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
     await copyTransactionInfoToAnchorBox(
       approvedBox[0].message,
       approvedBox[0].zip_code,
+      approvedBox[0].country,
       approvedBox[0].picture,
       approvedBox[0].general_location,
       approvedBox[0].date,
@@ -166,6 +174,7 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
       longitude,
       approvedBox[0].boxholder_name,
       approvedBox[0].boxholder_email,
+      approvedBox[0].pickup,
     );
     res.status(200).send('Successfully approved box');
   } catch (err) {

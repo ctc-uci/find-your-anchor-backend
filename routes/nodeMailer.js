@@ -6,11 +6,11 @@ const emailRouter = express();
 emailRouter.use(express.json());
 
 emailRouter.post('/send', (req, res) => {
-  const { email, messageHtml } = req.body;
+  const { email, messageHtml, subject } = req.body;
   const mail = {
     from: `${process.env.REACT_APP_EMAIL_FIRST_NAME} ${process.env.REACT_APP_EMAIL_LAST_NAME} ${process.env.REACT_APP_EMAIL_USERNAME}`,
     to: email,
-    subject: 'Contact form request',
+    subject,
     html: messageHtml,
   };
 
