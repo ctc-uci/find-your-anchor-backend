@@ -103,7 +103,7 @@ const createAnchorBoxes = async (formDatas) => {
         ${additionalComments || `''`},
         ${`'${country}'`},
         ${`'${latitude}'`},
-        ${`'${longitude}'`},
+        ${`'${longitude}'`});
       `;
       },
     );
