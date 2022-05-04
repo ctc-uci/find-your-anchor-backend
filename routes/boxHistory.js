@@ -10,6 +10,8 @@ const {
   copyTransactionInfoToAnchorBox,
   getHistoryOfBox,
   deleteBox,
+  deleteTransaction,
+  getMostRecentTransaction,
 } = require('../services/boxHistoryService');
 const { findBoxId } = require('../services/anchorBoxService');
 
@@ -159,34 +161,56 @@ boxHistoryRouter.get('/history/:boxID', async (req, res) => {
 // Approves a row in box history and then copies the relevant box information into Anchor Box
 boxHistoryRouter.put('/approveBox', async (req, res) => {
   try {
-    const { transactionID, latitude, longitude } = req.body;
+    const { transactionID, latitude, longitude, isMostRecentDate } = req.body;
     const approvedBox = await approveTransactionInBoxHistory(transactionID);
-    await copyTransactionInfoToAnchorBox(
-      approvedBox[0].message,
-      approvedBox[0].zip_code,
-      approvedBox[0].country,
-      approvedBox[0].picture,
-      approvedBox[0].general_location,
-      approvedBox[0].date,
-      approvedBox[0].launched_organically,
-      approvedBox[0].box_id,
-      latitude,
-      longitude,
-      approvedBox[0].boxholder_name,
-      approvedBox[0].boxholder_email,
-      approvedBox[0].pickup,
-    );
+    if (isMostRecentDate) {
+      await copyTransactionInfoToAnchorBox(
+        approvedBox[0].message,
+        approvedBox[0].zip_code,
+        approvedBox[0].country,
+        approvedBox[0].picture,
+        approvedBox[0].general_location,
+        approvedBox[0].date,
+        approvedBox[0].launched_organically,
+        approvedBox[0].box_id,
+        latitude,
+        longitude,
+        approvedBox[0].boxholder_name,
+        approvedBox[0].boxholder_email,
+        approvedBox[0].pickup,
+      );
+    }
     res.status(200).send('Successfully approved box');
   } catch (err) {
     res.status(500).send(err.message);
   }
 });
 
-boxHistoryRouter.delete('/:boxID', async (req, res) => {
+boxHistoryRouter.delete('/box/:boxID', async (req, res) => {
   try {
     const { boxID } = req.params;
     await deleteBox(boxID);
     res.status(200).send(`Successfully deleted box ${boxID}`);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+boxHistoryRouter.delete('/transaction/:transactionID', async (req, res) => {
+  try {
+    const { transactionID } = req.params;
+    await deleteTransaction(transactionID);
+    res.status(200).send(`Successfully deleted transaction ${transactionID}`);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+boxHistoryRouter.get('/mostRecentTransaction/:boxID', async (req, res) => {
+  try {
+    const { boxID } = req.params;
+    const mostRecentTransaction = await getMostRecentTransaction(boxID);
+    res.status(200).send(mostRecentTransaction);
   } catch (err) {
     res.status(500).send(err.message);
   }
