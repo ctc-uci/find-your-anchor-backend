@@ -148,31 +148,7 @@ const getAllLocationInfo = async () => {
   } catch (err) {
     throw new Error(err.message);
   }
-
-  const locationsByCountry = {};
-  res.forEach((location) => {
-    if (location.country in locationsByCountry) {
-      locationsByCountry[location.country].push(location);
-    } else {
-      locationsByCountry[location.country] = [location];
-    }
-  });
-
-  // locationsByCountry returns a dictionary where each key
-  // is a country and the value is the list of locations in that country
-  // {
-  //   country: [
-  //     {
-  //       zip_code,
-  //       country,
-  //       latitude,
-  //       longitude,
-  //       box_count
-  //     }
-  //   ]
-  // }
-
-  return locationsByCountry;
+  return res;
 };
 
 const getBoxesForSearch = async (query) => {
