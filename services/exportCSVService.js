@@ -25,9 +25,9 @@ const boxesToSQL = (boxRange) => {
     const valTrimmed = val.trim();
     if (valTrimmed.includes('-')) {
       const range = valTrimmed.split('-');
-      boxIdsSQL.push(`box_id BETWEEN ${range[0]} AND ${range[1]}`);
+      boxIdsSQL.push(`box_id::bigint BETWEEN ${range[0]} AND ${range[1]}`);
     } else {
-      boxIdsSQL.push(`box_id = ${valTrimmed}`);
+      boxIdsSQL.push(`box_id::bigint = ${valTrimmed}`);
     }
   });
   /* eslint-disable prefer-template */
