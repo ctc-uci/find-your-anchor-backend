@@ -4,9 +4,9 @@ const db = require('../config');
 const sortbyToSQL = (sortBy) => {
   switch (sortBy) {
     case 'ascend-box-num':
-      return 'box_id::int ASC';
+      return 'box_id::bigint ASC';
     case 'descend-box-num':
-      return 'box_id::int DESC';
+      return 'box_id::bigint DESC';
     case 'chronologic':
       return `TO_DATE(date, 'MM/DD/YYYY') ASC`;
     case 'ascend-zip-code':
@@ -14,7 +14,7 @@ const sortbyToSQL = (sortBy) => {
     case 'descend-zip-code':
       return 'zip_code DESC';
     default:
-      return 'box_id::int ASC';
+      return 'box_id::bigint ASC';
   }
 };
 
@@ -25,9 +25,9 @@ const boxesToSQL = (boxRange) => {
     const valTrimmed = val.trim();
     if (valTrimmed.includes('-')) {
       const range = valTrimmed.split('-');
-      boxIdsSQL.push(`box_id BETWEEN ${range[0]} AND ${range[1]}`);
+      boxIdsSQL.push(`box_id::bigint BETWEEN ${range[0]} AND ${range[1]}`);
     } else {
-      boxIdsSQL.push(`box_id = ${valTrimmed}`);
+      boxIdsSQL.push(`box_id::bigint = ${valTrimmed}`);
     }
   });
   /* eslint-disable prefer-template */
