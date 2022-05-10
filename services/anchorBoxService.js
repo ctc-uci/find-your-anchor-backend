@@ -64,7 +64,6 @@ const createAnchorBox = async (
       ],
     );
   } catch (err) {
-    console.log(err.message);
     throw new Error(err.message);
   }
   return res;
