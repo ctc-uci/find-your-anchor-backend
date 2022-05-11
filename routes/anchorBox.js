@@ -25,6 +25,7 @@ anchorBoxRouter.get('/', async (req, res) => {
   }
 });
 
+// get anchor box by id
 anchorBoxRouter.get('/box/:boxId', async (req, res) => {
   try {
     const { boxId } = req.params;
@@ -79,6 +80,7 @@ anchorBoxRouter.get('/search/', async (req, res) => {
   }
 });
 
+// upload a single box
 anchorBoxRouter.post('/box', async (req, res) => {
   try {
     const {
@@ -114,6 +116,7 @@ anchorBoxRouter.post('/box', async (req, res) => {
   }
 });
 
+// uplaod all anchor boxes
 anchorBoxRouter.post('/boxes', async (req, res) => {
   try {
     const response = await createAnchorBoxes(req.body);
@@ -123,6 +126,7 @@ anchorBoxRouter.post('/boxes', async (req, res) => {
   }
 });
 
+// delete box by id
 anchorBoxRouter.delete('/:boxId', async (req, res) => {
   try {
     const { boxId } = req.params;
