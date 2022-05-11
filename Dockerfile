@@ -3,6 +3,9 @@ FROM node:16.15.0-alpine
 # Set working dir
 WORKDIR /app
 
+# Add node_modules to PATH
+ENV PATH /app/node_modules/.bin:$PATH
+
 # Copies package.json and yarn.lock to Docker environment
 COPY package.json .
 COPY yarn.lock .
