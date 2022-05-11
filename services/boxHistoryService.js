@@ -14,6 +14,7 @@ const getTransactionByID = async (transactionID) => {
   return res;
 };
 
+// This returns pageSize boxes of a certain status
 const getBoxesWithStatusOrPickup = async (status, pageIndex, pageSize) => {
   let res = null;
   const offset = (pageIndex - 1) * pageSize;
