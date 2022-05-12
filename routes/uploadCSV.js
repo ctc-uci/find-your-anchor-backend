@@ -1,37 +1,21 @@
 const router = require('express-promise-router')();
-const { v4: uuidv4 } = require('uuid');
 const multer = require('multer');
-const csv = require('csv');
 const uploadCSVService = require('../services/uploadCSVService');
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage() }); // Middleware for passing files to route
 
 // Upload, parse, and validate CSV file => array of objects representing each row
 router.post('/', upload.single('file'), async (req, res) => {
   try {
-    console.log('Req File: ', req.file);
+    const resp = await uploadCSVService.parseCSV(req);
 
-    csv.parse(req.file.buffer, { columns: true }, function (err, data) {
-      const result = data.map((row) => {
-        const uid = uuidv4(); // generates an id to uniquely identify each row
-        const boxNumber = Number(row['Box No']);
-        const CSVRow = {
-          id: uid,
-          boxNumber,
-          date: row.Date,
-          zipCode: row['Zip Code'],
-          country: row.Country,
-          launchedOrganically: row['Launched Organically?'].toLowerCase() === 'yes',
-          error: false,
-        };
+    // console.log('data: ', data);
+    // console.log('Response: ', resp);
 
-        return CSVRow;
-      });
+    const used = process.memoryUsage().heapUsed / 1024 / 1024;
+    console.log(`The script uses approximately ${Math.round(used * 100) / 100} MB`);
 
-      console.log('result: ', result);
-    });
-
-    return res.status(200).send(await uploadCSVService.getBoxesByFilters(req.body));
+    return res.status(200).send(resp);
   } catch (err) {
     return res.status(500).send(err);
   }

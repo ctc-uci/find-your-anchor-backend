@@ -21,7 +21,7 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
-    "csv": "^6.0.5",
+    "csv-parse": "^5.0.4",
     "dotenv": "^10.0.0",
     "eslint": "^8.1.0",
     "eslint-config-airbnb-base": "^14.2.1",
