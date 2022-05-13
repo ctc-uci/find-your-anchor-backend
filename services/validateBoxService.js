@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const yup = require('yup');
 
 const schema = yup
@@ -12,20 +13,22 @@ const schema = yup
 
 // TODO: currently this unction returns an array of error messages for one row
 // but not sure if we should return something else
-const validateBoxWithYup = async (req) => {
+const validateBoxWithYup = async (box) => {
   try {
-    await schema.validate(req, { abortEarly: false });
+    await schema.validate(box, { abortEarly: false });
   } catch (err) {
-    const errors = [];
-    err.inner.forEach((e) => {
-      errors.push({
-        name: e.path,
-        message: e.message,
-      });
-    });
-    console.log('error: ', errors);
-    req.error = true;
+    // const errors = [];
+    // err.inner.forEach((e) => {
+    //   errors.push({
+    //     name: e.path,
+    //     message: e.message,
+    //   });
+    // });
+    // console.log('error: ', errors);
+    box.error = true;
   }
+
+  return box;
 };
 
 module.exports = {

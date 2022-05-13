@@ -5,7 +5,8 @@ const validateBoxService = require('./validateBoxService');
 
 const parseCSV = async (req) => {
   const data = await parse(req.file.buffer, { columns: true });
-  const results = data.map((row) => {
+  const boxNumbers = new Map();
+  const results = data.map((row, i) => {
     const uid = uuidv4(); // generates an id to uniquely identify each row
     const boxNumber = Number(row['Box No']);
     const CSVRow = {
@@ -18,19 +19,28 @@ const parseCSV = async (req) => {
       error: false,
     };
 
+    // Change this because can't pass JSON with map to frontend
+    if (!boxNumbers.has(boxNumber)) {
+      boxNumbers.set(boxNumber, new Set());
+    }
+    boxNumbers.get(boxNumber).add(i + 1);
+
     return CSVRow;
   });
 
   // Begin validation on data here
-  const responses = await Promise.all(
+  let numErrors = 0;
+  const rowData = await Promise.all(
     results.map(async (CSVRow) => {
-      return validateBoxService.validateBoxWithYup(CSVRow);
+      const validatedRow = await validateBoxService.validateBoxWithYup(CSVRow);
+      if (validatedRow.error) {
+        numErrors += 1;
+      }
+      return validatedRow;
     }),
   );
 
-  console.log('responses after validateBoxWithYup: ', responses);
-
-  return results;
+  return { rowData, boxNumbers, numErrors }; // Return custom object with row data and box number map
 };
 
 module.exports = {
