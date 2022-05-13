@@ -26,10 +26,11 @@ const getBoxesWithStatusOrPickup = async (status, pageIndex, pageSize) => {
         INNER JOIN (
             SELECT box_id, max(transaction_id) as MaxId
             FROM "Box_History"
+            WHERE
+              status='evaluated'
             GROUP BY box_id
         ) boxHistory2 ON boxHistory1.box_id = boxHistory2.box_id AND boxHistory1.transaction_id = boxHistory2.MaxId
-        WHERE
-          status='evaluated'
+
         ORDER BY
           pickup, boxHistory1.box_id
         LIMIT $(pageSize) OFFSET $(offset);`,
@@ -57,13 +58,8 @@ const getBoxCountUnderStatus = async (status, pageSize) => {
   try {
     if (status === 'evaluated') {
       res = await db.query(
-        `SELECT COUNT(*)
-        FROM "Box_History" boxHistory1
-        INNER JOIN (
-            SELECT box_id, max(transaction_id) as MaxId
-            FROM "Box_History"
-            GROUP BY box_id
-        ) boxHistory2 ON boxHistory1.box_id = boxHistory2.box_id AND boxHistory1.transaction_id = boxHistory2.MaxId
+        `SELECT COUNT(DISTINCT box_id)
+        FROM "Box_History"
         WHERE
           status='evaluated'`,
         {},
