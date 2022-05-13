@@ -1,10 +1,11 @@
 const { v4: uuidv4 } = require('uuid');
 // eslint-disable-next-line import/no-unresolved
 const { parse } = require('csv-parse/sync');
+const validateBoxService = require('./validateBoxService');
 
 const parseCSV = async (req) => {
   const data = await parse(req.file.buffer, { columns: true });
-  const result = data.map((row) => {
+  const results = data.map((row) => {
     const uid = uuidv4(); // generates an id to uniquely identify each row
     const boxNumber = Number(row['Box No']);
     const CSVRow = {
@@ -21,8 +22,15 @@ const parseCSV = async (req) => {
   });
 
   // Begin validation on data here
+  const responses = await Promise.all(
+    results.map(async (CSVRow) => {
+      return validateBoxService.validateBoxWithYup(CSVRow);
+    }),
+  );
 
-  return result;
+  console.log('responses after validateBoxWithYup: ', responses);
+
+  return results;
 };
 
 module.exports = {

@@ -10,6 +10,7 @@ const boxHistoryRouter = require('./routes/boxHistory');
 const exportCSVRouter = require('./routes/exportCSV');
 const uploadCSVRouter = require('./routes/uploadCSV');
 const anchorBoxRouter = require('./routes/anchorBox');
+const validateBoxRouter = require('./routes/validateBox');
 const s3UploadRouter = require('./routes/s3upload');
 const userRouter = require('./routes/users');
 const { authRouter } = require('./routes/auth');
@@ -35,6 +36,7 @@ app.use(
 app.use('/boxHistory', boxHistoryRouter);
 app.use('/exportCSV', exportCSVRouter);
 app.use('/uploadCSV', uploadCSVRouter);
+app.use('/validateBox', validateBoxRouter);
 app.use('/anchorBox', anchorBoxRouter);
 app.use('/s3Upload', s3UploadRouter);
 app.use('/users', userRouter);
