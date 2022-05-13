@@ -12,6 +12,7 @@ const {
   deleteBox,
   deleteTransaction,
   getMostRecentTransaction,
+  getBoxCountUnderStatus,
 } = require('../services/boxHistoryService');
 const { findBoxId } = require('../services/anchorBoxService');
 
@@ -122,11 +123,24 @@ boxHistoryRouter.post('/', async (req, res) => {
 // get all boxes that fulfill either the status requirement or pickup requirement (or both)
 boxHistoryRouter.get('/', async (req, res) => {
   try {
-    let { status, pickup } = req.query;
+    let { status } = req.query;
+    const { pageIndex, pageSize } = req.query;
     status = status === undefined ? '' : status;
-    pickup = pickup === undefined ? '' : pickup;
-    const allBoxes = await getBoxesWithStatusOrPickup(status, pickup);
+    const allBoxes = await getBoxesWithStatusOrPickup(status, pageIndex, pageSize);
     res.status(200).send(allBoxes);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// get box count of boxes under a status.
+boxHistoryRouter.get('/boxCount', async (req, res) => {
+  try {
+    let { status } = req.query;
+    const { pageSize } = req.query;
+    status = status === undefined ? '' : status;
+    const boxCount = await getBoxCountUnderStatus(status, pageSize);
+    res.status(200).send(boxCount);
   } catch (err) {
     res.status(500).send(err.message);
   }

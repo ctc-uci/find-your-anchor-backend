@@ -14,8 +14,10 @@ const getTransactionByID = async (transactionID) => {
   return res;
 };
 
-const getBoxesWithStatusOrPickup = async (status) => {
+// This returns pageSize boxes of a certain status
+const getBoxesWithStatusOrPickup = async (status, pageIndex, pageSize) => {
   let res = null;
+  const offset = (pageIndex - 1) * pageSize;
   try {
     if (status === 'evaluated') {
       res = await db.query(
@@ -24,13 +26,15 @@ const getBoxesWithStatusOrPickup = async (status) => {
         INNER JOIN (
             SELECT box_id, max(transaction_id) as MaxId
             FROM "Box_History"
+            WHERE
+              status='evaluated'
             GROUP BY box_id
         ) boxHistory2 ON boxHistory1.box_id = boxHistory2.box_id AND boxHistory1.transaction_id = boxHistory2.MaxId
-        WHERE
-          status='evaluated'
+
         ORDER BY
-          pickup, boxHistory1.box_id`,
-        { status },
+          pickup, boxHistory1.box_id
+        LIMIT $(pageSize) OFFSET $(offset);`,
+        { pageSize, offset },
       );
     } else {
       res = await db.query(
@@ -38,14 +42,41 @@ const getBoxesWithStatusOrPickup = async (status) => {
         WHERE
           ($(status) = '' OR status = $(status))
         ORDER BY
-          pickup, box_id;`,
-        { status },
+          pickup, box_id
+        LIMIT $(pageSize) OFFSET $(offset);`,
+        { status, pageSize, offset },
       );
     }
   } catch (err) {
     throw new Error(err.message);
   }
   return res;
+};
+
+const getBoxCountUnderStatus = async (status, pageSize) => {
+  let res = null;
+  try {
+    if (status === 'evaluated') {
+      res = await db.query(
+        `SELECT COUNT(DISTINCT box_id)
+        FROM "Box_History"
+        WHERE
+          status='evaluated'`,
+        {},
+      );
+    } else {
+      res = await db.query(
+        `SELECT COUNT(*) FROM "Box_History"
+        WHERE
+          ($(status) = '' OR status = $(status))`,
+        { status },
+      );
+    }
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  const totalNumberOfPages = Math.ceil(parseInt(res[0].count, 10) / pageSize);
+  return [{ totalNumberOfPages }];
 };
 
 const getMostRecentTransaction = async (boxId) => {
@@ -306,4 +337,5 @@ module.exports = {
   deleteBox,
   deleteTransaction,
   getMostRecentTransaction,
+  getBoxCountUnderStatus,
 };

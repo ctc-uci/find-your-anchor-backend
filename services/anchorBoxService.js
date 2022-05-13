@@ -1,16 +1,32 @@
 const db = require('../config');
 
-const getAnchorBoxesByLocation = async (zipCode, country) => {
+// This returns pageSize boxes at a location
+const getAnchorBoxesByLocation = async (zipCode, country, pageIndex, pageSize) => {
   let res = null;
+  const offset = (pageIndex - 1) * pageSize;
   try {
     res = await db.query(
-      'SELECT * FROM "Anchor_Box" WHERE zip_code = $1 AND country = $2 ORDER BY box_id',
-      [zipCode, country],
+      'SELECT * FROM "Anchor_Box" WHERE zip_code = $(zipCode) AND country = $(country) ORDER BY box_id LIMIT $(pageSize) OFFSET $(offset);',
+      { zipCode, country, pageSize, offset },
     );
   } catch (err) {
     throw new Error(err.message);
   }
   return res;
+};
+
+const getAnchorBoxCountInLocation = async (zipCode, country, pageSize) => {
+  let res = null;
+  try {
+    res = await db.query(
+      'SELECT COUNT(*) FROM "Anchor_Box" WHERE zip_code = $(zipCode) AND country = $(country)',
+      { zipCode, country },
+    );
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  const totalNumberOfPages = Math.ceil(parseInt(res[0].count, 10) / pageSize);
+  return [{ totalNumberOfPages }];
 };
 
 const findBoxId = async (id) => {
@@ -64,7 +80,6 @@ const createAnchorBox = async (
       ],
     );
   } catch (err) {
-    console.log(err.message);
     throw new Error(err.message);
   }
   return res;
@@ -175,4 +190,5 @@ module.exports = {
   getAllAnchorBoxesOnMap,
   getAllLocationInfo,
   getBoxesForSearch,
+  getAnchorBoxCountInLocation,
 };
