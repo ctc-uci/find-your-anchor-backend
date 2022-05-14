@@ -12,4 +12,15 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Validates zipcode in country via the zipcode data dump
+router.post('/countryZipcode', (req, res) => {
+  try {
+    const { zipCode, country } = req.body;
+    const resp = validateBoxService.checkZipcodeInDataDump(zipCode, country);
+    return res.status(200).send(resp);
+  } catch (err) {
+    return res.status(500).send(err);
+  }
+});
+
 module.exports = router;
