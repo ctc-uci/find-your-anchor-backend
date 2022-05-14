@@ -8,24 +8,34 @@ const {
   getAllAnchorBoxesOnMap,
   getAllLocationInfo,
   getBoxesForSearch,
+  getAnchorBoxCountInLocation,
 } = require('../services/anchorBoxService');
 
 anchorBoxRouter.get('/', async (req, res) => {
   try {
-    const { zipCode, country } = req.query;
+    const { zipCode, country, pageIndex, pageSize } = req.query;
     if (zipCode === undefined || country === undefined) {
       const anchorBoxes = await getAllAnchorBoxesOnMap();
       res.status(200).send(anchorBoxes);
       return;
     }
-    const anchorBoxes = await getAnchorBoxesByLocation(zipCode, country);
+    const anchorBoxes = await getAnchorBoxesByLocation(zipCode, country, pageIndex, pageSize);
     res.status(200).send(anchorBoxes);
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
-// get anchor box by id
+anchorBoxRouter.get('/boxCount', async (req, res) => {
+  try {
+    const { pageSize, zipCode, country } = req.query;
+    const boxCount = await getAnchorBoxCountInLocation(zipCode, country, pageSize);
+    res.status(200).send(boxCount);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
 anchorBoxRouter.get('/box/:boxId', async (req, res) => {
   try {
     const { boxId } = req.params;
