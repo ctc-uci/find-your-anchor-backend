@@ -116,7 +116,7 @@ anchorBoxRouter.post('/box', async (req, res) => {
   }
 });
 
-// uplaod all anchor boxes
+// upload multiple anchor boxes
 anchorBoxRouter.post('/boxes', async (req, res) => {
   try {
     const response = await createAnchorBoxes(req.body);

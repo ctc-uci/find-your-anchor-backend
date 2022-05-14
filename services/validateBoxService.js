@@ -3,14 +3,15 @@ const yup = require('yup');
 const countryCodeLookup = require('country-code-lookup');
 const zipcodeDataDump = require('../zipcodeDataDump.json');
 
+// returns an error message if either country or zipcode is invalid, otherwise returns a success message
 const checkZipcodeInDataDump = (zipCode, country) => {
-  // check if country code can be found and in both the country list and the data dump
+  // check if country code can be found and in both the list of country codes and the data dump
   const countryCode = countryCodeLookup.byCountry(country);
   if (countryCode === null || zipcodeDataDump[countryCode.iso2] === undefined) {
     return 'Missing or invalid country name';
   }
 
-  // check if the zipcode-country combo is a valid in the data dump
+  // check if the zipcode-country is a valid combination in the data dump
   if (!zipcodeDataDump[countryCode.iso2][zipCode]) {
     return `Zipcode ${zipCode} does not exist in this country`;
   }
@@ -36,9 +37,9 @@ function validateZipInCountry() {
   return this.test('isZipInCountry', async function zipcodeAndCountryCheck({ zipCode, country }) {
     const { path, createError } = this;
 
-    const validateResult = checkZipcodeInDataDump(zipCode, country);
-    if (validateResult !== 'success') {
-      return createError({ path, message: validateResult });
+    const validationMessage = checkZipcodeInDataDump(zipCode, country);
+    if (validationMessage !== 'success') {
+      return createError({ path, message: validationMessage });
     }
 
     return true;
@@ -62,7 +63,6 @@ const validateBoxWithYup = async (box, boxNumberMap) => {
   try {
     await schema.validate(box, { abortEarly: false, context: boxNumberMap });
   } catch (err) {
-    // console.log('ERR: ', err);
     box.error = true;
   }
   return box;

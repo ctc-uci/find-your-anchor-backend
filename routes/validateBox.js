@@ -12,7 +12,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Validates zipcode in country via the zipcode data dump
+// Validates zipcode in country using the zipcode data dump
 router.post('/countryZipcode', (req, res) => {
   try {
     const { zipCode, country } = req.body;
