@@ -14,7 +14,7 @@ router.post('/', upload.single('file'), async (req, res) => {
     const used = process.memoryUsage().heapUsed / 1024 / 1024;
     console.log(`The script uses approximately ${Math.round(used * 100) / 100} MB`);
 
-    return res.status(500).send(resp);
+    return res.status(200).send(resp);
   } catch (err) {
     return res.status(500).send(err);
   }
