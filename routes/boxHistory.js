@@ -10,7 +10,6 @@ const {
   copyTransactionInfoToAnchorBox,
   getHistoryOfBox,
   deleteBox,
-  getLatLongOfBox,
   deleteTransaction,
   getMostRecentTransaction,
   getBoxCountUnderStatus,
@@ -147,16 +146,6 @@ boxHistoryRouter.get('/boxCount', async (req, res) => {
   }
 });
 
-boxHistoryRouter.get('/latLong', async (req, res) => {
-  try {
-    const { zipCode, country } = req.query;
-    const response = getLatLongOfBox(zipCode, country);
-    res.status(200).send(response);
-  } catch (err) {
-    res.status(500).send(err.message);
-  }
-});
-
 // get a box
 boxHistoryRouter.get('/transaction/:transactionID', async (req, res) => {
   const { transactionID } = req.params;
@@ -190,10 +179,10 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
     const approvedBox = await approveTransactionInBoxHistory(transactionID);
     if (isMostRecentDate) {
       await copyTransactionInfoToAnchorBox(
-        approvedBox[0].message_status !== 'rejected' ? approvedBox[0].message : '',
+        approvedBox[0].message,
         approvedBox[0].zip_code,
         approvedBox[0].country,
-        approvedBox[0].image_status !== 'rejected' ? approvedBox[0].picture : '',
+        approvedBox[0].picture,
         approvedBox[0].general_location,
         approvedBox[0].date,
         approvedBox[0].launched_organically,
