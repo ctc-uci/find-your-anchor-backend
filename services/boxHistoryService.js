@@ -1,4 +1,5 @@
 const db = require('../config');
+const zipcodeDataDump = require('../zipcodeDataDump.json');
 
 const getTransactionByID = async (transactionID) => {
   let res = null;
@@ -77,6 +78,19 @@ const getBoxCountUnderStatus = async (status, pageSize) => {
   }
   const totalNumberOfPages = Math.ceil(parseInt(res[0].count, 10) / pageSize);
   return [{ totalNumberOfPages }];
+};
+
+const getLatLongOfBox = (zipCode, country) => {
+  // check if country code can be found and in both the list of country codes and the data dump
+  if (country === null || zipcodeDataDump[country] === undefined) {
+    return [null, null];
+  }
+
+  // check if the zipcode-country is a valid combination in the data dump
+  if (!zipcodeDataDump[country][zipCode]) {
+    return [null, null];
+  }
+  return [zipcodeDataDump[country][zipCode].lat, zipcodeDataDump[country][zipCode].long];
 };
 
 const getMostRecentTransaction = async (boxId) => {
@@ -330,6 +344,7 @@ module.exports = {
   getTransactionByID,
   getHistoryOfBox,
   getBoxesWithStatusOrPickup,
+  getLatLongOfBox,
   updateBox,
   addBox,
   approveTransactionInBoxHistory,
