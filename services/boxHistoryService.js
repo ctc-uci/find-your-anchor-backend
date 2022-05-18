@@ -100,7 +100,7 @@ const getMostRecentTransaction = async (boxId) => {
       `SELECT *
         FROM "Box_History" boxHistory1
         INNER JOIN (
-            SELECT box_id, max(date) as mostRecentDate
+            SELECT box_id, TO_CHAR(max(TO_DATE(date, 'MM/DD/YYYY')), 'MM/DD/YYYY') as mostRecentDate
             FROM "Box_History"
             WHERE status = 'evaluated' AND approved = TRUE
             GROUP BY box_id
@@ -110,6 +110,7 @@ const getMostRecentTransaction = async (boxId) => {
       [boxId],
     );
   } catch (err) {
+    console.log(err);
     throw new Error(err.message);
   }
   return res;
@@ -249,7 +250,7 @@ const getHistoryOfBox = async (boxID) => {
   let res = null;
   try {
     res = await db.query(
-      'SELECT * FROM "Box_History" WHERE status = \'evaluated\' AND approved = TRUE AND box_id = $1 ORDER BY date DESC, transaction_id',
+      `SELECT * FROM "Box_History" WHERE status = 'evaluated' AND approved = TRUE AND box_id = $1 ORDER BY TO_DATE(date, 'MM/DD/YYYY') DESC, transaction_id`,
       [boxID],
     );
   } catch (err) {
