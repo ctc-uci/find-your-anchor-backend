@@ -1,3 +1,5 @@
+const countryCodeLookup = require('country-code-lookup');
+const zipcodeDataDump = require('../zipcodeDataDump.json');
 const db = require('../config');
 
 // This returns pageSize boxes at a location
@@ -100,9 +102,10 @@ const createAnchorBoxes = async (formDatas) => {
         date,
         launchedOrganically,
         additionalComments,
-        latitude,
-        longitude,
       }) => {
+        const countryCode = countryCodeLookup.byCountry(country).iso2;
+        const latitude = zipcodeDataDump[countryCode][zipCode].lat;
+        const longitude = zipcodeDataDump[countryCode][zipCode].long;
         multiBoxesQuery += `INSERT INTO "Anchor_Box"
         (box_id, message,
         zip_code, picture, general_location,
@@ -116,7 +119,7 @@ const createAnchorBoxes = async (formDatas) => {
         ${`'${date}'`},
         ${launchedOrganically},
         ${additionalComments || `''`},
-        ${`'${country}'`},
+        ${`'${countryCode}'`},
         ${`'${latitude}'`},
         ${`'${longitude}'`});
       `;
