@@ -110,7 +110,6 @@ const getMostRecentTransaction = async (boxId) => {
       [boxId],
     );
   } catch (err) {
-    console.log(err);
     throw new Error(err.message);
   }
   return res;
