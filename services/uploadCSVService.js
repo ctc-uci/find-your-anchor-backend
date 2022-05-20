@@ -32,7 +32,7 @@ const parseCSV = async (req) => {
   let numErrors = 0;
 
   // Create set of current box no's in PostgreSQL here
-  const boxes = await db.query('SELECT box_id FROM "Anchor_Box2"');
+  const boxes = await db.query('SELECT box_id FROM "Anchor_Box"');
   const boxNumSet = new Set(boxes.map((box) => Number(box.box_id)));
 
   const rowData = await Promise.all(

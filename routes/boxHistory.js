@@ -8,6 +8,7 @@ const {
   getBoxesWithStatusOrPickup,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
+  getLatLongOfBox,
   getHistoryOfBox,
   deleteBox,
   deleteTransaction,
@@ -141,6 +142,16 @@ boxHistoryRouter.get('/boxCount', async (req, res) => {
     status = status === undefined ? '' : status;
     const boxCount = await getBoxCountUnderStatus(status, pageSize);
     res.status(200).send(boxCount);
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+boxHistoryRouter.get('/latLong', async (req, res) => {
+  try {
+    const { zipCode, country } = req.query;
+    const response = getLatLongOfBox(zipCode, country);
+    res.status(200).send(response);
   } catch (err) {
     res.status(500).send(err.message);
   }
