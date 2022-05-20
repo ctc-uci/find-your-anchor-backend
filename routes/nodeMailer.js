@@ -1,11 +1,12 @@
 const express = require('express');
 const transporter = require('../transporter');
+const verifyToken = require('../services/authService');
 
 const emailRouter = express();
 
 emailRouter.use(express.json());
 
-emailRouter.post('/send', (req, res) => {
+emailRouter.post('/send', verifyToken, (req, res) => {
   const { email, messageHtml, subject } = req.body;
   const mail = {
     from: `${process.env.REACT_APP_EMAIL_FIRST_NAME} ${process.env.REACT_APP_EMAIL_LAST_NAME} ${process.env.REACT_APP_EMAIL_USERNAME}`,

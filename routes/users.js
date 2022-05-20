@@ -1,5 +1,6 @@
 // Routes relating to accounts here
 const express = require('express');
+const verifyToken = require('../services/authService');
 
 const userRouter = express();
 const admin = require('../firebase');
@@ -20,7 +21,7 @@ const isAlphaNumeric = (value) => {
 };
 
 // Get a specific user by ID
-userRouter.get('/userId/:userId', async (req, res) => {
+userRouter.get('/userId/:userId', verifyToken, async (req, res) => {
   try {
     const { userId } = req.params;
     isAlphaNumeric(userId); // ID must be alphanumeric
@@ -48,7 +49,7 @@ userRouter.get('/email/:email', async (req, res) => {
 });
 
 // Delete a specific user by ID, both in Firebase and NPO DB
-userRouter.delete('/:userId', async (req, res) => {
+userRouter.delete('/:userId', verifyToken, async (req, res) => {
   try {
     const { userId } = req.params;
     isAlphaNumeric(userId); // ID must be alphanumeric
@@ -86,7 +87,7 @@ userRouter.post('/create', async (req, res) => {
 });
 
 // Edit user in database
-userRouter.put('/:userId', async (req, res) => {
+userRouter.put('/:userId', verifyToken, async (req, res) => {
   try {
     const { firstName, lastName, userId } = req.body;
     isAlphaNumeric(userId); // ID must be alphanumeric
