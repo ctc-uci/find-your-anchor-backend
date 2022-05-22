@@ -6,7 +6,6 @@ router.post('/boxes', async (req, res) => {
   try {
     return res.status(200).send(await exportCSVService.getBoxesByFilters(req.body));
   } catch (err) {
-    console.log(err);
     return res.status(500).send(err);
   }
 });
