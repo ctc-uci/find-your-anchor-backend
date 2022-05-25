@@ -23,10 +23,13 @@ app.use(bodyParser.raw());
 app.use(cookieParser());
 
 const PORT = process.env.PORT || 3001;
+// by default the react app host will be on port 80
+const origin =
+  process.env.NODE_ENV === 'production' ? `${process.env.REACT_APP_HOST}` : 'http://localhost:3000';
 
 app.use(
   cors({
-    origin: `${process.env.REACT_APP_HOST}:${process.env.REACT_APP_PORT}`,
+    origin,
     credentials: true,
   }),
 );
