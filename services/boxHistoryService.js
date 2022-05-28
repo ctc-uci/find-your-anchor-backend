@@ -1,4 +1,5 @@
 const db = require('../config');
+const zipcodeDataDump = require('../zipcodeDataDump.json');
 
 const getTransactionByID = async (transactionID) => {
   let res = null;
@@ -79,6 +80,19 @@ const getBoxCountUnderStatus = async (status, pageSize) => {
   return [{ totalNumberOfPages }];
 };
 
+const getLatLongOfBox = (zipCode, country) => {
+  // check if country code can be found and in both the list of country codes and the data dump
+  if (country === null || zipcodeDataDump[country] === undefined) {
+    return [null, null];
+  }
+
+  // check if the zipcode-country is a valid combination in the data dump
+  if (!zipcodeDataDump[country][zipCode]) {
+    return [null, null];
+  }
+  return [zipcodeDataDump[country][zipCode].lat, zipcodeDataDump[country][zipCode].long];
+};
+
 const getMostRecentTransaction = async (boxId) => {
   let res = null;
   try {
@@ -86,7 +100,7 @@ const getMostRecentTransaction = async (boxId) => {
       `SELECT *
         FROM "Box_History" boxHistory1
         INNER JOIN (
-            SELECT box_id, max(date) as mostRecentDate
+            SELECT box_id, TO_CHAR(max(TO_DATE(date, 'MM/DD/YYYY')), 'MM/DD/YYYY') as mostRecentDate
             FROM "Box_History"
             WHERE status = 'evaluated' AND approved = TRUE
             GROUP BY box_id
@@ -235,7 +249,7 @@ const getHistoryOfBox = async (boxID) => {
   let res = null;
   try {
     res = await db.query(
-      'SELECT * FROM "Box_History" WHERE status = \'evaluated\' AND approved = TRUE AND box_id = $1 ORDER BY date DESC, transaction_id',
+      `SELECT * FROM "Box_History" WHERE status = 'evaluated' AND approved = TRUE AND box_id = $1 ORDER BY TO_DATE(date, 'MM/DD/YYYY') DESC, transaction_id`,
       [boxID],
     );
   } catch (err) {
@@ -330,6 +344,7 @@ module.exports = {
   getTransactionByID,
   getHistoryOfBox,
   getBoxesWithStatusOrPickup,
+  getLatLongOfBox,
   updateBox,
   addBox,
   approveTransactionInBoxHistory,
