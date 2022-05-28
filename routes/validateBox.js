@@ -1,8 +1,9 @@
 const router = require('express-promise-router')();
+const verifyToken = require('../services/authService');
 const validateBoxService = require('../services/validateBoxService');
 
 // Validates the fields for a SINGLE box object via yup
-router.post('/', async (req, res) => {
+router.post('/', verifyToken, async (req, res) => {
   try {
     const { box } = req.body;
     const resp = await validateBoxService.validateBoxWithYup(box);
@@ -13,7 +14,7 @@ router.post('/', async (req, res) => {
 });
 
 // Validates zipcode in country using the zipcode data dump
-router.post('/countryZipcode', (req, res) => {
+router.post('/countryZipcode', verifyToken, (req, res) => {
   try {
     const { zipCode, country } = req.body;
     const resp = validateBoxService.checkZipcodeInDataDump(zipCode, country);

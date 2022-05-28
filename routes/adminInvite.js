@@ -1,4 +1,5 @@
 const express = require('express');
+const verifyToken = require('../services/authService');
 
 const adminInviteRouter = express();
 const {
@@ -9,7 +10,7 @@ const {
 
 adminInviteRouter.use(express.json());
 
-adminInviteRouter.post('/', async (req, res) => {
+adminInviteRouter.post('/', verifyToken, async (req, res) => {
   const { email, inviteId } = req.body;
   try {
     const admin = await addAdminInvite(email, inviteId);
@@ -22,7 +23,7 @@ adminInviteRouter.post('/', async (req, res) => {
 });
 
 // Get a specific admin by invite ID
-adminInviteRouter.get('/:inviteId', async (req, res) => {
+adminInviteRouter.get('/:inviteId', verifyToken, async (req, res) => {
   try {
     const { inviteId } = req.params;
     const admin = await getAdminInvite(inviteId);
@@ -35,7 +36,7 @@ adminInviteRouter.get('/:inviteId', async (req, res) => {
 });
 
 // Delete an admin invite
-adminInviteRouter.delete('/:email', async (req, res) => {
+adminInviteRouter.delete('/:email', verifyToken, async (req, res) => {
   try {
     const { email } = req.params;
     await deleteAdminInvite(email);

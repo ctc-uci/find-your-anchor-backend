@@ -16,11 +16,12 @@ const {
   getBoxCountUnderStatus,
 } = require('../services/boxHistoryService');
 const { findBoxId } = require('../services/anchorBoxService');
+const verifyToken = require('../services/authService');
 
 boxHistoryRouter.use(express.json());
 
 // update status of pick up box
-boxHistoryRouter.put('/update', async (req, res) => {
+boxHistoryRouter.put('/update', verifyToken, async (req, res) => {
   try {
     const {
       status,
@@ -65,7 +66,7 @@ boxHistoryRouter.put('/update', async (req, res) => {
 });
 
 // Adds a box to the Box History table
-boxHistoryRouter.post('/', async (req, res) => {
+boxHistoryRouter.post('/', verifyToken, async (req, res) => {
   try {
     const {
       boxID,
@@ -122,7 +123,7 @@ boxHistoryRouter.post('/', async (req, res) => {
 });
 
 // get all boxes that fulfill either the status requirement or pickup requirement (or both)
-boxHistoryRouter.get('/', async (req, res) => {
+boxHistoryRouter.get('/', verifyToken, async (req, res) => {
   try {
     let { status } = req.query;
     const { pageIndex, pageSize } = req.query;
@@ -135,7 +136,7 @@ boxHistoryRouter.get('/', async (req, res) => {
 });
 
 // get box count of boxes under a status.
-boxHistoryRouter.get('/boxCount', async (req, res) => {
+boxHistoryRouter.get('/boxCount', verifyToken, async (req, res) => {
   try {
     let { status } = req.query;
     const { pageSize } = req.query;
@@ -158,7 +159,7 @@ boxHistoryRouter.get('/latLong', async (req, res) => {
 });
 
 // get a box
-boxHistoryRouter.get('/transaction/:transactionID', async (req, res) => {
+boxHistoryRouter.get('/transaction/:transactionID', verifyToken, async (req, res) => {
   const { transactionID } = req.params;
   try {
     const box = await getTransactionByID(transactionID);
@@ -184,7 +185,7 @@ boxHistoryRouter.get('/history/:boxID', async (req, res) => {
 });
 
 // Approves a row in box history and then copies the relevant box information into Anchor Box
-boxHistoryRouter.put('/approveBox', async (req, res) => {
+boxHistoryRouter.put('/approveBox', verifyToken, async (req, res) => {
   try {
     const { transactionID, latitude, longitude, isMostRecentDate } = req.body;
     const approvedBox = await approveTransactionInBoxHistory(transactionID);
@@ -211,7 +212,7 @@ boxHistoryRouter.put('/approveBox', async (req, res) => {
   }
 });
 
-boxHistoryRouter.delete('/box/:boxID', async (req, res) => {
+boxHistoryRouter.delete('/box/:boxID', verifyToken, async (req, res) => {
   try {
     const { boxID } = req.params;
     await deleteBox(boxID);
@@ -221,7 +222,7 @@ boxHistoryRouter.delete('/box/:boxID', async (req, res) => {
   }
 });
 
-boxHistoryRouter.delete('/transaction/:transactionID', async (req, res) => {
+boxHistoryRouter.delete('/transaction/:transactionID', verifyToken, async (req, res) => {
   try {
     const { transactionID } = req.params;
     await deleteTransaction(transactionID);
@@ -231,7 +232,7 @@ boxHistoryRouter.delete('/transaction/:transactionID', async (req, res) => {
   }
 });
 
-boxHistoryRouter.get('/mostRecentTransaction/:boxID', async (req, res) => {
+boxHistoryRouter.get('/mostRecentTransaction/:boxID', verifyToken, async (req, res) => {
   try {
     const { boxID } = req.params;
     const mostRecentTransaction = await getMostRecentTransaction(boxID);

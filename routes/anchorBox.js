@@ -1,4 +1,5 @@
 const anchorBoxRouter = require('express-promise-router')();
+const verifyToken = require('../services/authService');
 const {
   findBoxId,
   createAnchorBox,
@@ -90,7 +91,8 @@ anchorBoxRouter.get('/search/', async (req, res) => {
   }
 });
 
-anchorBoxRouter.post('/box', async (req, res) => {
+// upload a single box
+anchorBoxRouter.post('/box', verifyToken, async (req, res) => {
   try {
     const {
       boxNumber,
@@ -125,7 +127,8 @@ anchorBoxRouter.post('/box', async (req, res) => {
   }
 });
 
-anchorBoxRouter.post('/boxes', async (req, res) => {
+// upload multiple anchor boxes
+anchorBoxRouter.post('/boxes', verifyToken, async (req, res) => {
   try {
     const response = await createAnchorBoxes(req.body);
     res.status(200).send(response);
@@ -134,7 +137,8 @@ anchorBoxRouter.post('/boxes', async (req, res) => {
   }
 });
 
-anchorBoxRouter.delete('/:boxId', async (req, res) => {
+// delete box by id
+anchorBoxRouter.delete('/:boxId', verifyToken, async (req, res) => {
   try {
     const { boxId } = req.params;
     const response = await deleteAnchorBox(boxId);

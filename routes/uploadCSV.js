@@ -1,11 +1,13 @@
 const router = require('express-promise-router')();
 const multer = require('multer');
+const verifyToken = require('../services/authService');
+
 const uploadCSVService = require('../services/uploadCSVService');
 
 const upload = multer({ storage: multer.memoryStorage() }); // Middleware for passing files to route
 
 // Upload, parse, and validate CSV file => array of objects representing each row
-router.post('/', upload.single('file'), async (req, res) => {
+router.post('/', verifyToken, upload.single('file'), async (req, res) => {
   try {
     const resp = await uploadCSVService.parseCSV(req);
 
