@@ -46,7 +46,7 @@ const zipcodeToSQL = (zipCode) => {
 const boxDetailsToSQL = (boxDetails) => {
   return boxDetails.length > 0
     ? boxDetails.join(', ')
-    : 'date, box_id, zip_code, picture, general_location, launched_organically, message';
+    : 'date, box_id, zip_code, country, picture, general_location, launched_organically, message';
 };
 
 const getBoxesByFilters = async (req) => {
@@ -60,6 +60,8 @@ const getBoxesByFilters = async (req) => {
     endDate,
     zipOption,
     zipCode,
+    countryOption,
+    country,
     launchedOrganically,
     boxDetails,
   } = req;
@@ -71,6 +73,10 @@ const getBoxesByFilters = async (req) => {
     }
     if (zipOption === 'zip-code-custom') {
       whereClauseConditions.push(zipcodeToSQL(zipCode));
+    }
+
+    if (countryOption === 'country-custom') {
+      whereClauseConditions.push(`country = '${country}'`);
     }
     if (dateOption === 'date-single') {
       whereClauseConditions.push(`date = '${singleDate}'`);
