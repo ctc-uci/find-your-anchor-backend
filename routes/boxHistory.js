@@ -66,7 +66,7 @@ boxHistoryRouter.put('/update', verifyToken, async (req, res) => {
 });
 
 // Adds a box to the Box History table
-boxHistoryRouter.post('/', verifyToken, async (req, res) => {
+boxHistoryRouter.post('/', async (req, res) => {
   try {
     const {
       boxID,
@@ -159,7 +159,7 @@ boxHistoryRouter.get('/latLong', async (req, res) => {
 });
 
 // get a box
-boxHistoryRouter.get('/transaction/:transactionID', verifyToken, async (req, res) => {
+boxHistoryRouter.get('/transaction/:transactionID', async (req, res) => {
   const { transactionID } = req.params;
   try {
     const box = await getTransactionByID(transactionID);
