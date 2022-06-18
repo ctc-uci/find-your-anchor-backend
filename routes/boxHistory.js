@@ -123,7 +123,7 @@ boxHistoryRouter.post('/', async (req, res) => {
 });
 
 // get all boxes that fulfill either the status requirement or pickup requirement (or both)
-boxHistoryRouter.get('/', verifyToken, async (req, res) => {
+boxHistoryRouter.get('/', async (req, res) => {
   try {
     let { status } = req.query;
     const { pageIndex, pageSize } = req.query;
@@ -136,7 +136,7 @@ boxHistoryRouter.get('/', verifyToken, async (req, res) => {
 });
 
 // get box count of boxes under a status.
-boxHistoryRouter.get('/boxCount', verifyToken, async (req, res) => {
+boxHistoryRouter.get('/boxCount', async (req, res) => {
   try {
     let { status } = req.query;
     const { pageSize } = req.query;
@@ -232,7 +232,7 @@ boxHistoryRouter.delete('/transaction/:transactionID', verifyToken, async (req, 
   }
 });
 
-boxHistoryRouter.get('/mostRecentTransaction/:boxID', verifyToken, async (req, res) => {
+boxHistoryRouter.get('/mostRecentTransaction/:boxID', async (req, res) => {
   try {
     const { boxID } = req.params;
     const mostRecentTransaction = await getMostRecentTransaction(boxID);
