@@ -23,7 +23,7 @@ adminInviteRouter.post('/', verifyToken, async (req, res) => {
 });
 
 // Get a specific admin by invite ID
-adminInviteRouter.get('/:inviteId', verifyToken, async (req, res) => {
+adminInviteRouter.get('/:inviteId', async (req, res) => {
   try {
     const { inviteId } = req.params;
     const admin = await getAdminInvite(inviteId);
