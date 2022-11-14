@@ -36,7 +36,7 @@ adminInviteRouter.get('/:inviteId', async (req, res) => {
 });
 
 // Delete an admin invite
-adminInviteRouter.delete('/:email', verifyToken, async (req, res) => {
+adminInviteRouter.delete('/:email', async (req, res) => {
   try {
     const { email } = req.params;
     await deleteAdminInvite(email);
