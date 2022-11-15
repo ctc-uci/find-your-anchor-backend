@@ -249,7 +249,7 @@ const getHistoryOfBox = async (boxID) => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT * FROM "Box_History" WHERE status = 'evaluated' AND approved = TRUE AND box_id = $1 ORDER BY TO_DATE(date, 'MM/DD/YYYY') DESC, transaction_id`,
+      `SELECT * FROM "Box_History" WHERE status = 'evaluated' AND approved = TRUE AND box_id = $1 ORDER BY TO_DATE(date, 'MM/DD/YYYY') DESC, transaction_id DESC`,
       [boxID],
     );
   } catch (err) {
