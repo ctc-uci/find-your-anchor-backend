@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 const express = require('express');
 
 const boxHistoryRouter = express();
@@ -193,7 +194,8 @@ boxHistoryRouter.put('/approveBox', verifyToken, async (req, res) => {
     const approvedBox = await approveTransactionInBoxHistory(transactionID);
     if (isMostRecentDate) {
       await copyTransactionInfoToAnchorBox(
-        approvedBox[0].message_status === 'rejected' ? null : approvedBox[0].message,
+        // eslint-disable-next-line prettier/prettier
+        approvedBox[0].message_status === 'rejected' ? null : (approvedBox[0].message ? approvedBox[0].message : ''),
         approvedBox[0].zip_code,
         approvedBox[0].country,
         approvedBox[0].image_status === 'rejected' ? null : approvedBox[0].picture,
