@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 const db = require('../config');
 const zipcodeDataDump = require('../zipcodeDataDump.json');
 
@@ -149,9 +150,8 @@ const updateBox = async (
         ${changesRequested !== undefined ? ', changes_requested = $(changesRequested)' : ''}
         ${rejectionReason !== undefined ? ', rejection_reason = $(rejectionReason)' : ''}
         ${messageStatus !== undefined ? ', message_status = $(messageStatus)' : ''}
-        ${
-          launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
-        }
+        ${launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
+      }
         ${imageStatus !== undefined ? ', image_status = $(imageStatus)' : ''}
         ${admin !== undefined ? ', admin = $(admin)' : ''}
       WHERE
@@ -260,6 +260,7 @@ const getHistoryOfBox = async (boxID) => {
 
 const addBox = async (
   boxID,
+  approved,
   message,
   boxholderEmail,
   boxholderName,
@@ -300,7 +301,7 @@ const addBox = async (
         boxholderName,
         generalLocation,
         picture,
-        approved: false,
+        approved: approved !== undefined,
         status,
         pickup,
         changesRequested,

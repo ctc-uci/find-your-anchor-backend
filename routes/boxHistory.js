@@ -71,6 +71,7 @@ boxHistoryRouter.post('/', async (req, res) => {
     const {
       boxID,
       message,
+      approved,
       boxholderEmail,
       boxholderName,
       generalLocation,
@@ -99,6 +100,7 @@ boxHistoryRouter.post('/', async (req, res) => {
 
     const response = await addBox(
       boxID,
+      approved,
       message,
       boxholderEmail,
       boxholderName,
