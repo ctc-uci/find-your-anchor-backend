@@ -85,14 +85,18 @@ const getBoxesByFilters = async (req) => {
         `TO_DATE(date, 'MM/DD/YYYY') BETWEEN (DATE '${startDate}') AND (DATE '${endDate}')`,
       );
     }
-    whereClauseConditions.push(`launched_organically = ${launchedOrganically === 'yes'}`);
+    if (launchedOrganically.length === 1) {
+      whereClauseConditions.push(`launched_organically = ${launchedOrganically[0] === 'yes'}`);
+    }
 
     const whereClauseSQL = whereClauseConditions.join(' AND '); // combine all the conditions in the where clause
     const orderBySQL = sortbyToSQL(sortBy);
     const selectClauseSQL = boxDetailsToSQL(boxDetails);
 
     const res = await db.query(
-      `SELECT ${selectClauseSQL} FROM "Anchor_Box" WHERE ${whereClauseSQL} ORDER BY ${orderBySQL}`,
+      // eslint-disable-next-line prettier/prettier
+      `SELECT ${selectClauseSQL} FROM "Anchor_Box" ${whereClauseSQL ? `WHERE ${whereClauseSQL}` : ''
+      } ORDER BY ${orderBySQL}`,
     );
 
     return res;
