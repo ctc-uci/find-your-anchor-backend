@@ -154,8 +154,8 @@ boxHistoryRouter.get('/boxCount', async (req, res) => {
 boxHistoryRouter.get('/latLong', async (req, res) => {
   try {
     const { zipCode, country } = req.query;
-    const response = getLatLongOfBox(zipCode, country);
-    res.status(200).send(response);
+    const response = await getLatLongOfBox(zipCode, country);
+    res.status(200).send(response.data?.data[0]);
   } catch (err) {
     res.status(500).send(err.message);
   }

@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
+const axios = require('axios');
 const db = require('../config');
-const zipcodeDataDump = require('../zipcodeDataDump.json');
+require('dotenv').config('..');
 
 const getTransactionByID = async (transactionID) => {
   let res = null;
@@ -81,17 +82,11 @@ const getBoxCountUnderStatus = async (status, pageSize) => {
   return [{ totalNumberOfPages }];
 };
 
-const getLatLongOfBox = (zipCode, country) => {
-  // check if country code can be found and in both the list of country codes and the data dump
-  if (country === null || zipcodeDataDump[country] === undefined) {
-    return [null, null];
-  }
-
-  // check if the zipcode-country is a valid combination in the data dump
-  if (!zipcodeDataDump[country][zipCode]) {
-    return [null, null];
-  }
-  return [zipcodeDataDump[country][zipCode].lat, zipcodeDataDump[country][zipCode].long];
+const getLatLongOfBox = async (zipCode, country) => {
+  const res = await axios.get(
+    `http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}`,
+  );
+  return res;
 };
 
 const getMostRecentTransaction = async (boxId) => {
