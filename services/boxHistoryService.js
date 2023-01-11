@@ -85,17 +85,15 @@ const getBoxCountUnderStatus = async (status, pageSize) => {
 
 const getLatLongOfBox = async (zipCode, country) => {
   const res = await axios.get(
-    `https://api.geocod.io/v1.7/geocode?api_key=${process.env.GEOCODER_API_KEY}&q=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}`,
+    `http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}`,
   );
   return res;
 };
 
 const getLatLongOfBoxes = async (locations) => {
-  const res = await axios.post(`https://api.geocod.io/v1.7/geocode?api_key=${process.env.GEOCODER_API_KEY}`, locations)
-  return res.data.results.map(result => {
-    const { lat: latitude, lng: longitude } = result.response.results[0]?.location;
-    return { latitude, longitude }
-  });
+  const requests = locations.map(({ zipCode, country }) => axios.get(`http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}`))
+  const results = await Promise.allSettled(requests);
+  return results.map(result => result.value.data.data[0] ? result.value.data.data[0] : { latitude: null, longitude: null });
 }
 
 const getMostRecentTransaction = async (boxId) => {

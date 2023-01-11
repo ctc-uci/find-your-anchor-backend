@@ -95,7 +95,7 @@ const createAnchorBoxes = async (formDatas) => {
     let multiBoxesQuery = ``;
     const latLongs = await getLatLongOfBoxes(
       formDatas.map(({ zipCode, country }) => ({
-        q: zipCode,
+        zipCode,
         country: countryCodeLookup.byCountry(country).iso2,
       })),
     );
