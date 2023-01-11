@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 const yup = require('yup');
 const countryCodeLookup = require('country-code-lookup');
+const { postcodeValidator } = require('postcode-validator');
+
 const zipcodeDataDump = require('../zipcodeDataDump.json');
 
 // returns an error message if either country or zipcode is invalid, otherwise returns a success message
@@ -12,7 +14,7 @@ const checkZipcodeInDataDump = (zipCode, country) => {
   }
 
   // check if the zipcode-country is a valid combination in the data dump
-  if (!zipcodeDataDump[countryCode.iso2][zipCode]) {
+  if (!postcodeValidator(zipCode, countryCode.iso2)) {
     return `Zipcode ${zipCode} does not exist in this country`;
   }
 

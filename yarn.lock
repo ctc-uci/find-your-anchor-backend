@@ -3013,6 +3013,11 @@ please-upgrade-node@^3.2.0:
   dependencies:
     semver-compare "^1.0.0"
 
+postcode-validator@^3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/postcode-validator/-/postcode-validator-3.7.0.tgz#ea180b860e55adba839fd7f453464b99fc116ecc"
+  integrity sha512-pl697wPxQ8kb3S0qoIHdNsqPjMY3ieKQtR6+dp0o+NOlM6ImzDpyKSdlXgGzzjoUElDUdXWezFjGGd9yITM+Xg==
+
 postgres-array@~2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/postgres-array/-/postgres-array-2.0.0.tgz#48f8fce054fbc69671999329b8834b772652d82e"

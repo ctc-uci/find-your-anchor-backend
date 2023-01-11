@@ -1,4 +1,5 @@
 /* eslint-disable prettier/prettier */
+const countryCodeLookup = require('country-code-lookup');
 const axios = require('axios');
 const db = require('../config');
 require('dotenv').config('..');
@@ -84,10 +85,18 @@ const getBoxCountUnderStatus = async (status, pageSize) => {
 
 const getLatLongOfBox = async (zipCode, country) => {
   const res = await axios.get(
-    `http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}`,
+    `https://api.geocod.io/v1.7/geocode?api_key=${process.env.GEOCODER_API_KEY}&q=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}`,
   );
   return res;
 };
+
+const getLatLongOfBoxes = async (locations) => {
+  const res = await axios.post(`https://api.geocod.io/v1.7/geocode?api_key=${process.env.GEOCODER_API_KEY}`, locations)
+  return res.data.results.map(result => {
+    const { lat: latitude, lng: longitude } = result.response.results[0]?.location;
+    return { latitude, longitude }
+  });
+}
 
 const getMostRecentTransaction = async (boxId) => {
   let res = null;
@@ -316,6 +325,49 @@ const addBox = async (
   return res;
 };
 
+const addBoxHistories = async (formDatas) => {
+  let res = null;
+  try {
+    let multiBoxesQuery = '';
+    formDatas.forEach(
+      (
+        {
+          boxNumber,
+          message,
+          zipCode,
+          picture,
+          boxLocation,
+          country,
+          date,
+          launchedOrganically,
+        }
+      ) => {
+        const countryCode = countryCodeLookup.byCountry(country).iso2;
+        multiBoxesQuery += `INSERT INTO "Box_History"
+        (box_id, message,
+        zip_code, picture, general_location,
+        date, launched_organically, country, approved, status)
+        VALUES(
+        ${boxNumber || `''`},
+        ${message || `''`},
+        ${`'${zipCode}'`},
+        ${picture || `''`},
+        ${boxLocation || `''`},
+        ${`'${date}'`},
+        ${launchedOrganically},
+        ${`'${countryCode}'`},
+        TRUE,
+        'evaluated');
+      `;
+      },
+    );
+    res = await db.multi(multiBoxesQuery);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+  return res;
+}
+
 const deleteBox = async (boxID) => {
   let res = null;
   try {
@@ -341,8 +393,10 @@ module.exports = {
   getHistoryOfBox,
   getBoxesWithStatusOrPickup,
   getLatLongOfBox,
+  getLatLongOfBoxes,
   updateBox,
   addBox,
+  addBoxHistories,
   approveTransactionInBoxHistory,
   copyTransactionInfoToAnchorBox,
   deleteBox,

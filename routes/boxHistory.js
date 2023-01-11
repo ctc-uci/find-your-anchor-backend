@@ -5,6 +5,7 @@ const boxHistoryRouter = express();
 const {
   updateBox,
   addBox,
+  addBoxHistories,
   getTransactionByID,
   getBoxesWithStatusOrPickup,
   approveTransactionInBoxHistory,
@@ -125,6 +126,15 @@ boxHistoryRouter.post('/', async (req, res) => {
   }
 });
 
+boxHistoryRouter.post('/boxes', verifyToken, async (req, res) => {
+  try {
+    const response = await addBoxHistories(req.body);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 // get all boxes that fulfill either the status requirement or pickup requirement (or both)
 boxHistoryRouter.get('/', async (req, res) => {
   try {
@@ -155,7 +165,7 @@ boxHistoryRouter.get('/latLong', async (req, res) => {
   try {
     const { zipCode, country } = req.query;
     const response = await getLatLongOfBox(zipCode, country);
-    res.status(200).send(response.data?.data[0]);
+    res.status(200).send(response.data?.results[0]?.location);
   } catch (err) {
     res.status(500).send(err.message);
   }
