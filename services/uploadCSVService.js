@@ -9,7 +9,7 @@ const parseCSV = async (req) => {
   const boxNumbers = {};
   const results = data.map((row) => {
     const uid = uuidv4(); // generates an id to uniquely identify each row
-    const boxNumber = Number(row['Box No']);
+    const boxNumber = Number(String(row['Box No']).replace(',', ''));
     const CSVRow = {
       id: uid,
       boxNumber,
