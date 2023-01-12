@@ -14,7 +14,11 @@ const parseCSV = async (req) => {
       id: uid,
       boxNumber,
       date: row.Date,
-      zipCode: row['Zip Code'],
+      // Edge case - 4 digit zip codes in the US are left padded with zero
+      zipCode:
+        row.Country === 'United States' && row['Zip Code'].length === 4
+          ? `0${row['Zip Code']}`
+          : row['Zip Code'],
       country: row.Country,
       launchedOrganically: row['Launched Organically?'].toLowerCase() === 'yes',
       error: false,
