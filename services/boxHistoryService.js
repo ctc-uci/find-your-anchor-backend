@@ -85,15 +85,29 @@ const getBoxCountUnderStatus = async (status, pageSize) => {
 
 const getLatLongOfBox = async (zipCode, country) => {
   const res = await axios.get(
-    `http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}`,
+    `http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}&limit=1`,
   );
   return res;
 };
 
 const getLatLongOfBoxes = async (locations) => {
-  const requests = locations.map(({ zipCode, country }) => axios.get(`http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}`))
-  const results = await Promise.allSettled(requests);
-  return results.map(result => result.value.data.data[0] ? result.value.data.data[0] : { latitude: null, longitude: null });
+  let results = [];
+  // Split this into chunks because Positionstack can't handle when batch is too big
+  const chunkSize = 5;
+  for (let i = 0; i < locations.length; i += chunkSize) {
+    try {
+      const chunk = locations.slice(i, i + chunkSize);
+      const requests = chunk.map(({ zipCode, country }) => axios.get(`http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}&limit=1`));
+      // do whatever
+      // eslint-disable-next-line no-await-in-loop
+      const tempResults = await Promise.all(requests);
+      results = results.concat(tempResults.map(result => result.data.data.length ? { latitude: result.data.data[0].latitude, longitude: result.data.data[0].longitude } : { latitude: null, longitude: null }))
+    } catch (err) {
+      console.log(err.message);
+    }
+
+  }
+  return results;
 }
 
 const getMostRecentTransaction = async (boxId) => {

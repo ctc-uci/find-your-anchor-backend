@@ -114,9 +114,10 @@ const createAnchorBoxes = async (formDatas) => {
         },
         index,
       ) => {
-        const countryCode = countryCodeLookup.byCountry(country).iso2;
         const { latitude, longitude } = latLongs[index];
-        multiBoxesQuery += `INSERT INTO "Anchor_Box"
+        if (latitude !== null && longitude !== null) {
+          const countryCode = countryCodeLookup.byCountry(country).iso2;
+          multiBoxesQuery += `INSERT INTO "Anchor_Box"
         (box_id, message,
         zip_code, picture, general_location,
         date, launched_organically, additional_comments, country, latitude, longitude)
@@ -133,6 +134,7 @@ const createAnchorBoxes = async (formDatas) => {
         ${`'${latitude}'`},
         ${`'${longitude}'`});
       `;
+        }
       },
     );
     res = await db.multi(multiBoxesQuery);
