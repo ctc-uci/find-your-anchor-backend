@@ -74,7 +74,7 @@ anchorBoxRouter.get('/locations', async (req, res) => {
 anchorBoxRouter.get('/search/', async (req, res) => {
   try {
     const { q } = req.query;
-    const results = await getBoxesForSearch(q.toString());
+    const results = await getBoxesForSearch(q.toString().replace(',', ''));
     // Put dummy boundingbox attribute (MUST be array of length 4 with stringified numbers)
     for (let i = 0; i < results.length; i += 1) {
       results[i].custom = true;
