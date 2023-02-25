@@ -85,6 +85,14 @@ anchorBoxRouter.get('/search/', async (req, res) => {
         results[i].lon.toString(),
       ];
     }
+    if (!results.length) {
+      results.push({
+        display_name: 'No Find Your Anchor boxes found',
+        lat: 0,
+        lon: 0,
+        boundingbox: ['0', '0', '0', '0'],
+      });
+    }
     res.send(results);
   } catch (error) {
     res.status(500).send(error);
