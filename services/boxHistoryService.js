@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable*/
 const countryCodeLookup = require('country-code-lookup');
 const axios = require('axios');
 const db = require('../config');
@@ -85,7 +85,7 @@ const getBoxCountUnderStatus = async (status, pageSize) => {
 
 const getLatLongOfBox = async (zipCode, country) => {
   const res = await axios.get(
-    `http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}&limit=1`,
+    `https://nominatim.openstreetmap.org/search?postalcode=${zipCode}&country=${country}&format=json`,
   );
   return res;
 };
@@ -93,22 +93,36 @@ const getLatLongOfBox = async (zipCode, country) => {
 const getLatLongOfBoxes = async (locations) => {
   let results = [];
   // Split this into chunks because Positionstack can't handle when batch is too big
-  const chunkSize = 5;
-  for (let i = 0; i < locations.length; i += chunkSize) {
+  // const chunkSize = 5;
+  // for (let i = 0; i < locations.length; i += chunkSize) {
+  //   try {
+  //     const chunk = locations.slice(i, i + chunkSize);
+  //     const requests = chunk.map(({ zipCode, country }) => axios.get(`http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}&limit=1`));
+  //     // do whatever
+  //     // eslint-disable-next-line no-await-in-loop
+  //     const tempResults = await Promise.all(requests);
+  //     results = results.concat(tempResults.map(result => result.data.data.length ? { latitude: result.data.data[0].latitude, longitude: result.data.data[0].longitude } : { latitude: null, longitude: null }))
+  //   } catch (err) {
+  //     console.log(err.message);
+  //   }
+  // const start = new Date();
+  for (const { zipCode, country } of locations) {
     try {
-      const chunk = locations.slice(i, i + chunkSize);
-      const requests = chunk.map(({ zipCode, country }) => axios.get(`http://api.positionstack.com/v1/forward?access_key=${process.env.GEOCODER_API_KEY}&query=${encodeURIComponent(zipCode)}&country=${encodeURIComponent(country)}&limit=1`));
-      // do whatever
-      // eslint-disable-next-line no-await-in-loop
-      const tempResults = await Promise.all(requests);
-      results = results.concat(tempResults.map(result => result.data.data.length ? { latitude: result.data.data[0].latitude, longitude: result.data.data[0].longitude } : { latitude: null, longitude: null }))
+      const res = await axios.get(
+        `https://nominatim.openstreetmap.org/search?postalcode=${zipCode}&country=${country}&format=json`,
+      );
+      results.push(
+        res.data
+          ? { latitude: res.data[0].lat, longitude: res.data[0].lon }
+          : { latitude: null, longitude: null },
+      );
     } catch (err) {
       console.log(err.message);
     }
-
   }
+  // console.log(`Getting lat/longs took ${new Date() - start} milliseconds`);
   return results;
-}
+};
 
 const getMostRecentTransaction = async (boxId) => {
   let res = null;
@@ -166,8 +180,9 @@ const updateBox = async (
         ${changesRequested !== undefined ? ', changes_requested = $(changesRequested)' : ''}
         ${rejectionReason !== undefined ? ', rejection_reason = $(rejectionReason)' : ''}
         ${messageStatus !== undefined ? ', message_status = $(messageStatus)' : ''}
-        ${launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
-      }
+        ${
+          launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
+        }
         ${imageStatus !== undefined ? ', image_status = $(imageStatus)' : ''}
         ${admin !== undefined ? ', admin = $(admin)' : ''}
       WHERE
@@ -342,18 +357,16 @@ const addBoxHistories = async (formDatas) => {
   try {
     let multiBoxesQuery = '';
     formDatas.forEach(
-      (
-        {
-          boxNumber,
-          message,
-          zipCode,
-          picture,
-          boxLocation,
-          country,
-          date,
-          launchedOrganically,
-        }
-      ) => {
+      ({
+        boxNumber,
+        message,
+        zipCode,
+        picture,
+        boxLocation,
+        country,
+        date,
+        launchedOrganically,
+      }) => {
         const countryCode = countryCodeLookup.byCountry(country).iso2;
         multiBoxesQuery += `INSERT INTO "Box_History"
         (box_id, message,
@@ -378,7 +391,7 @@ const addBoxHistories = async (formDatas) => {
     throw new Error(err.message);
   }
   return res;
-}
+};
 
 const deleteBox = async (boxID) => {
   let res = null;

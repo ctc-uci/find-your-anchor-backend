@@ -165,7 +165,7 @@ boxHistoryRouter.get('/latLong', async (req, res) => {
   try {
     const { zipCode, country } = req.query;
     const response = await getLatLongOfBox(zipCode, country);
-    res.status(200).send(response.data?.data[0]);
+    res.status(200).send({ latitude: response.data[0].lat, longitude: response.data[0].lon });
   } catch (err) {
     res.status(500).send(err.message);
   }
@@ -205,7 +205,11 @@ boxHistoryRouter.put('/approveBox', verifyToken, async (req, res) => {
     if (isMostRecentDate) {
       await copyTransactionInfoToAnchorBox(
         // eslint-disable-next-line prettier/prettier
-        approvedBox[0].message_status === 'rejected' ? null : (approvedBox[0].message ? approvedBox[0].message : ''),
+        approvedBox[0].message_status === 'rejected'
+          ? null
+          : approvedBox[0].message
+          ? approvedBox[0].message
+          : '',
         approvedBox[0].zip_code,
         approvedBox[0].country,
         approvedBox[0].image_status === 'rejected' ? null : approvedBox[0].picture,
