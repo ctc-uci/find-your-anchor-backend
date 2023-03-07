@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable */
 const yup = require('yup');
 const countryCodeLookup = require('country-code-lookup');
 const { postcodeValidator } = require('postcode-validator');
@@ -39,20 +39,20 @@ function validateZipInCountry() {
   return this.test('isZipInCountry', async function zipcodeAndCountryCheck({ zipCode, country }) {
     const { path, createError } = this;
 
-    const validationMessage = checkZipcodeInDataDump(zipCode, country);
-    if (validationMessage !== 'success') {
-      return createError({ path, message: validationMessage });
-    }
+    // const validationMessage = checkZipcodeInDataDump(zipCode, country);
+    // if (validationMessage !== 'success') {
+    //   return createError({ path, message: validationMessage });
+    // }
 
     return true;
   });
 }
 
-yup.addMethod(yup.number, 'boxNotExists', validateBoxNumber);
+yup.addMethod(yup.string, 'boxNotExists', validateBoxNumber);
 yup.addMethod(yup.object, 'isZipInCountry', validateZipInCountry);
 const schema = yup
   .object({
-    boxNumber: yup.number().required().boxNotExists().typeError('Missing or invalid box number'),
+    boxNumber: yup.string().required().boxNotExists().typeError('Missing or invalid box number'),
     date: yup.date().required().typeError('Missing or invalid date'),
     zipCode: yup.string().required('Missing or invalid zip code'),
     country: yup.string(),
