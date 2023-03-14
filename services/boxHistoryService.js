@@ -112,15 +112,14 @@ const getLatLongOfBoxes = async (locations) => {
         `https://nominatim.openstreetmap.org/search?postalcode=${zipCode}&country=${country}&format=json`,
       );
       results.push(
-        res.data
-          ? { latitude: res.data[0].lat, longitude: res.data[0].lon }
+        res.data.length
+          ? { latitude: res.data[0]?.lat, longitude: res.data[0]?.lon }
           : { latitude: null, longitude: null },
       );
     } catch (err) {
       console.log(err.message);
     }
   }
-  // console.log(`Getting lat/longs took ${new Date() - start} milliseconds`);
   return results;
 };
 
