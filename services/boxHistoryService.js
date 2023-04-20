@@ -1,6 +1,6 @@
 /* eslint-disable*/
 const countryCodeLookup = require('country-code-lookup');
-const axios = require('axios');
+const axios = require('./axios');
 const db = require('../config');
 require('dotenv').config('..');
 
@@ -84,7 +84,7 @@ const getBoxCountUnderStatus = async (status, pageSize) => {
 };
 
 const getLatLongOfBox = async (zipCode, country) => {
-  const res = await axios.get(
+  const res = await axios().get(
     `https://nominatim.openstreetmap.org/search?postalcode=${zipCode}&country=${country}&format=json`,
   );
   return res;
@@ -108,16 +108,19 @@ const getLatLongOfBoxes = async (locations) => {
   // const start = new Date();
   for (const { zipCode, country } of locations) {
     try {
-      const res = await axios.get(
+      const res = await axios().get(
         `https://nominatim.openstreetmap.org/search?postalcode=${zipCode}&country=${country}&format=json`,
       );
+      // console.log(res.data.length ? { latitude: res.data[0]?.lat, longitude: res.data[0]?.lon } : { latitude: null, longitude: null })
       results.push(
         res.data.length
           ? { latitude: res.data[0]?.lat, longitude: res.data[0]?.lon }
           : { latitude: null, longitude: null },
       );
     } catch (err) {
-      console.log(err.message);
+      throw new Error(err.message);
+      // console.log(err);
+      // console.log(err.message);
     }
   }
   return results;
@@ -179,9 +182,8 @@ const updateBox = async (
         ${changesRequested !== undefined ? ', changes_requested = $(changesRequested)' : ''}
         ${rejectionReason !== undefined ? ', rejection_reason = $(rejectionReason)' : ''}
         ${messageStatus !== undefined ? ', message_status = $(messageStatus)' : ''}
-        ${
-          launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
-        }
+        ${launchedOrganically !== undefined ? ', launched_organically = $(launchedOrganically)' : ''
+      }
         ${imageStatus !== undefined ? ', image_status = $(imageStatus)' : ''}
         ${admin !== undefined ? ', admin = $(admin)' : ''}
       WHERE
@@ -389,6 +391,7 @@ const addBoxHistories = async (formDatas) => {
   } catch (err) {
     throw new Error(err.message);
   }
+  // console.log('Created boxes in Box_History')
   return res;
 };
 
