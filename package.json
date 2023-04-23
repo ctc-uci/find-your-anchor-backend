@@ -16,6 +16,7 @@
     "*.js": "yarn run eslint"
   },
   "dependencies": {
+    "agentkeepalive": "^4.3.0",
     "aws-sdk": "^2.1069.0",
     "axios": "^1.2.2",
     "body-parser": "^1.19.1",
