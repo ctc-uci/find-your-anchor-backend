@@ -94,11 +94,15 @@ const createAnchorBoxes = async (formDatas) => {
   try {
     let multiBoxesQuery = ``;
     const latLongs = await getLatLongOfBoxes(
-      formDatas.map(({ zipCode, country }) => ({
-        zipCode,
-        country: countryCodeLookup.byCountry(country).iso2,
-      })),
+      formDatas.map(({ zipCode, country }) => {
+        return {
+          zipCode,
+          country: countryCodeLookup.byCountry(country).iso2,
+        };
+      }),
     );
+    // console.log('latLongs', latLongs);
+    // console.log('formDatas', formDatas);
     formDatas.forEach(
       (
         {
@@ -141,6 +145,7 @@ const createAnchorBoxes = async (formDatas) => {
   } catch (err) {
     throw new Error(err.message);
   }
+  // console.log('Created boxes in Anchor Box');
   return res;
 };
 
@@ -185,7 +190,7 @@ const getBoxesForSearch = async (query) => {
   let res = null;
   try {
     res = await db.query(
-      `SELECT latitude as lat, longitude as lon, box_id as display_name, zip_code, country FROM "Anchor_Box" WHERE box_id LIKE '%' || $1 || '%'
+      `SELECT latitude as lat, longitude as lon, box_id as display_name, zip_code, country FROM "Anchor_Box" WHERE box_id = $1
       AND latitude IS NOT NULL AND longitude IS NOT NULL AND country is NOT NULL AND zip_code IS NOT NULL
       ORDER BY box_id::bigint`,
       [query],
