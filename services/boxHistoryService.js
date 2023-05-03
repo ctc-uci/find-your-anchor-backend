@@ -327,7 +327,7 @@ const addBox = async (
       )
       RETURNING *;`,
       {
-        boxID,
+        boxID: boxID.replace(',', ''),
         message,
         boxholderEmail,
         boxholderName,
@@ -374,7 +374,7 @@ const addBoxHistories = async (formDatas) => {
         zip_code, picture, general_location,
         date, launched_organically, country, approved, status)
         VALUES(
-        ${boxNumber || `''`},
+        ${boxNumber ? boxNumber.replace(',', '') : `''`},
         ${message || `''`},
         ${`'${zipCode}'`},
         ${picture || `''`},
