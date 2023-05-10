@@ -97,7 +97,7 @@ boxHistoryRouter.post('/', async (req, res) => {
     );
     if (missingParams) return res.status(400).send('Missing a required parameter');
     // Check if box exists in anchor box
-    const matchingBox = await findBoxId(boxID);
+    const matchingBox = await findBoxId(boxID.replace(',', ''));
     if (matchingBox.length === 0) return res.status(400).send('Could not a find box with that ID');
 
     const response = await addBox(

@@ -26,6 +26,8 @@ function validateBoxNumber() {
     const { path, createError } = this;
     const boxNumberMap = option.options.context;
 
+    const boxNumberFormatted = boxNumber.replace(',', '');
+
     // if box number if found on more than one row
     if (boxNumberMap && boxNumber in boxNumberMap && boxNumberMap[boxNumber] > 1) {
       return createError({ path, message: `Duplicate found: ${boxNumber}` });
