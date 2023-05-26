@@ -70,7 +70,7 @@ const createAnchorBox = async (
       VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       RETURNING *;`,
       [
-        boxNumber.replace(',', ''),
+        boxNumber.toString().replace(',', ''),
         message,
         zipCode,
         picture,
@@ -126,7 +126,7 @@ const createAnchorBoxes = async (formDatas) => {
         zip_code, picture, general_location,
         date, launched_organically, additional_comments, country, latitude, longitude)
         VALUES(
-        ${boxNumber ? boxNumber.replace(',', '') : `''`},
+        ${boxNumber ? boxNumber.toString().replace(',', '') : `''`},
         ${message || `''`},
         ${`'${zipCode}'`},
         ${picture || `''`},

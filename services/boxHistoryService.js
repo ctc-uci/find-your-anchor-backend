@@ -327,7 +327,7 @@ const addBox = async (
       )
       RETURNING *;`,
       {
-        boxID: boxID.replace(',', ''),
+        boxID: boxID.toString().replace(',', ''),
         message,
         boxholderEmail,
         boxholderName,
